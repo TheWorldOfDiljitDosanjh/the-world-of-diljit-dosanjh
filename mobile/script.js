@@ -25,14 +25,20 @@ const state = {
     },
     isFirstVisit: true,
     currentPage: 'games', // 'games', 'library', 'lyrics'
-    searchPreference: 'song'
+    searchPreference: 'song',
+    scrollPositions: {
+        home: 0,
+        games: 0,
+        library: 0,
+        lyrics: 0,
+        settings: 0
+    }
 };
 
 // ============================================
 // DOM REFERENCES
 // ============================================
 
-// We'll populate these as we go
 const DOM = {};
 
 // ============================================
@@ -68,26 +74,100 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
         setupHomePage();
     }
+    
+    // Setup scroll position tracking
+    setupScrollTracking();
 });
 
 // ============================================
-// FIRST VISIT CHECK
+// FIRST VISIT CHECK - FIXED
 // ============================================
 
 function checkFirstVisit() {
     const visited = localStorage.getItem('diljit_visited');
+    
     if (visited === 'true') {
         state.isFirstVisit = false;
-        // If on settings.html and not first visit, redirect to index
-        if (window.location.pathname.includes('settings.html')) {
-            window.location.href = 'index.html';
-        }
+        // Don't redirect from settings if we're already there
+        // Let the user freely navigate
     } else {
         state.isFirstVisit = true;
         // If not on settings.html, redirect to settings
-        if (!window.location.pathname.includes('settings.html')) {
-            window.location.href = 'settings.html';
+        // But only if we're not already on settings
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('settings.html') && !currentPath.includes('main.html')) {
+            // Only redirect from home page
+            if (currentPath.includes('index.html') || currentPath === '/' || currentPath === '/mobile/') {
+                window.location.href = 'settings.html';
+            }
         }
+    }
+}
+
+// ============================================
+// SCROLL POSITION TRACKING
+// ============================================
+
+function setupScrollTracking() {
+    // Track scroll position on home page
+    const homeContent = document.getElementById('home-content');
+    if (homeContent) {
+        // Restore scroll position
+        const savedPos = state.scrollPositions.home || 0;
+        window.scrollTo(0, savedPos);
+        
+        // Save on scroll
+        window.addEventListener('scroll', function() {
+            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
+                state.scrollPositions.home = window.scrollY;
+            }
+        });
+    }
+    
+    // Track scroll on main page sections
+    if (window.location.pathname.includes('main.html')) {
+        // Save scroll positions when switching sections
+        const sections = ['games', 'library', 'lyrics'];
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Restore scroll position when section becomes active
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            if (section.classList.contains('active')) {
+                                const savedPos = state.scrollPositions[sectionId] || 0;
+                                window.scrollTo(0, savedPos);
+                            } else {
+                                // Save position when leaving
+                                state.scrollPositions[sectionId] = window.scrollY;
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(section, { attributes: true });
+            }
+        });
+        
+        // Also save on scroll
+        window.addEventListener('scroll', function() {
+            const activeSection = document.querySelector('.page-section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id;
+                state.scrollPositions[sectionId] = window.scrollY;
+            }
+        });
+    }
+    
+    // Track settings page scroll
+    if (window.location.pathname.includes('settings.html')) {
+        const savedPos = state.scrollPositions.settings || 0;
+        window.scrollTo(0, savedPos);
+        
+        window.addEventListener('scroll', function() {
+            state.scrollPositions.settings = window.scrollY;
+        });
     }
 }
 
@@ -127,8 +207,6 @@ function applyTheme() {
 // ============================================
 
 function setupNavigation() {
-    // Header navigation links will work natively via href
-    // But we need to handle active states on main.html sections
     const navItems = document.querySelectorAll('.nav-item');
     const currentPath = window.location.pathname;
     
@@ -178,13 +256,19 @@ function switchMainSection(section) {
         targetSection.classList.add('active');
         state.currentPage = section;
         
-        // Update header nav
+        // Update header nav - only for text items
         const navLinks = document.querySelectorAll('.nav-item[data-page]');
         navLinks.forEach(link => {
             if (link.dataset.page === section) {
                 link.classList.add('active-text');
             }
         });
+        
+        // Restore scroll position for this section
+        const savedPos = state.scrollPositions[section] || 0;
+        setTimeout(() => {
+            window.scrollTo(0, savedPos);
+        }, 50);
     }
 }
 
@@ -337,7 +421,7 @@ function setupSettingsPage() {
 // ============================================
 
 function setupHomePage() {
-    // Display user name
+    // Display user name - no blue color
     const nameDisplay = document.getElementById('user-name-display');
     if (nameDisplay && state.settings.name) {
         nameDisplay.textContent = state.settings.name;
