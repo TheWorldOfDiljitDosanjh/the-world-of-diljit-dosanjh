@@ -5,7 +5,9 @@
     box-sizing: border-box;
 }
 
-body {
+html, body {
+    width: 100%;
+    overflow-x: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background-color: #f5f5f5;
     color: #000000;
@@ -43,6 +45,12 @@ body.light-mode .player-btn img {
     filter: invert(1);
 }
 
+body.light-mode .help-box {
+    background-color: #e6f3ff;
+    border-left: 4px solid #158edd;
+    color: #000000;
+}
+
 /* Dark Mode */
 body.dark-mode {
     background-color: #1a1a1a;
@@ -63,6 +71,12 @@ body.dark-mode #player-controls {
     border-top: 1px solid #333333;
 }
 
+body.dark-mode .help-box {
+    background-color: #1a3a5a;
+    border-left: 4px solid #158edd;
+    color: #ffffff;
+}
+
 /* Sticky Header */
 header {
     position: fixed;
@@ -76,6 +90,7 @@ header {
     display: flex;
     align-items: center;
     transition: background-color 0.3s, border-color 0.3s;
+    max-width: 100vw;
 }
 
 nav {
@@ -98,6 +113,7 @@ nav {
     align-items: center;
     justify-content: center;
     transition: color 0.3s;
+    white-space: nowrap;
 }
 
 .nav-icon {
@@ -143,6 +159,8 @@ main {
     max-width: 480px;
     margin: 0 auto;
     padding: 20px 16px;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 h1, h2 {
@@ -152,6 +170,7 @@ h1, h2 {
 
 h1 {
     font-size: 24px;
+    line-height: 1.3;
 }
 
 h2 {
@@ -159,6 +178,21 @@ h2 {
 }
 
 /* Home Page Styles */
+.welcome-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.welcome-container h1 {
+    margin-bottom: 4px;
+}
+
+.website-title {
+    color: #158edd;
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
 #user-name-display {
     color: #158edd;
 }
@@ -393,8 +427,8 @@ body.dark-mode .sec-btn.active {
 
 /* Help Boxes */
 .help-box {
-    background-color: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background-color: #e6f3ff;
+    border-left: 4px solid #158edd;
     padding: 12px;
     margin-top: 10px;
     border-radius: 4px;
@@ -412,13 +446,17 @@ body.dark-mode .sec-btn.active {
     top: -12px;
     left: 20px;
     font-size: 16px;
-    color: #ffc107;
+    color: #158edd;
 }
 
 body.dark-mode .help-box {
-    background-color: #2a2a2a;
-    border-left-color: #ffc107;
+    background-color: #1a3a5a;
+    border-left-color: #158edd;
     color: #ffffff;
+}
+
+body.dark-mode .help-box .help-arrow {
+    color: #158edd;
 }
 
 /* Main Page Sections */
@@ -441,6 +479,7 @@ body.dark-mode .help-box {
     padding: 10px 16px;
     z-index: 999;
     transition: background-color 0.3s, border-color 0.3s;
+    max-width: 100vw;
 }
 
 .player-row-top {
@@ -522,6 +561,7 @@ body.dark-mode .help-box {
     font-size: 16px;
     background-color: #ffffff;
     color: #000000;
+    min-width: 0;
 }
 
 body.dark-mode #search-input {
@@ -533,6 +573,7 @@ body.dark-mode #search-input {
 .search-dropdown {
     position: relative;
     min-width: 140px;
+    flex-shrink: 0;
 }
 
 .dropdown-toggle {
@@ -546,6 +587,7 @@ body.dark-mode #search-input {
     align-items: center;
     justify-content: space-between;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 body.dark-mode .dropdown-toggle {
@@ -557,6 +599,7 @@ body.dark-mode .dropdown-toggle {
 .dropdown-icon {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
 }
 
 body.light-mode .dropdown-icon {
@@ -626,15 +669,18 @@ body.dark-mode .album-container {
     height: 80px;
     border-radius: 8px;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .album-info {
     flex: 1;
+    min-width: 0;
 }
 
 .album-name {
     font-size: 18px;
     font-weight: 600;
+    word-break: break-word;
 }
 
 .album-meta {
@@ -702,6 +748,7 @@ body.dark-mode .song-table td {
     border-radius: 12px;
     line-height: 2;
     font-size: 16px;
+    -webkit-overflow-scrolling: touch;
 }
 
 body.dark-mode #lyrics-container {
@@ -723,11 +770,12 @@ body.dark-mode #lyrics-container {
     font-size: 18px;
 }
 
-/* Responsive Scaling for Mobile */
+/* Responsive Scaling for Mobile - Prevent Zoom */
 @media screen and (max-width: 480px) {
     body {
         padding-top: 56px;
         padding-bottom: 110px;
+        font-size: 14px;
     }
     
     header {
@@ -739,7 +787,7 @@ body.dark-mode #lyrics-container {
     }
     
     .nav-item {
-        font-size: 14px;
+        font-size: 13px;
     }
     
     .nav-icon {
@@ -753,6 +801,10 @@ body.dark-mode #lyrics-container {
     
     h1 {
         font-size: 20px;
+    }
+    
+    .website-title {
+        font-size: 24px;
     }
     
     h2 {
@@ -785,4 +837,13 @@ body.dark-mode #lyrics-container {
         width: 60px;
         height: 60px;
     }
+    
+    .search-dropdown {
+        min-width: 120px;
+    }
+}
+
+/* Prevent any horizontal scroll */
+img, iframe, video, canvas, svg {
+    max-width: 100%;
 }
