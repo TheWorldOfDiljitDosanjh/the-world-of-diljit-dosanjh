@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main - World of Diljit Dosanjh</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sticky Header -->
+    <header>
+        <nav>
+            <a href="index.html" class="nav-item">
+                <img src="images/icons/home.png" alt="Home" class="nav-icon">
+            </a>
+            <a href="#games" class="nav-item active-text" data-page="games">Games</a>
+            <a href="#library" class="nav-item" data-page="library">Library</a>
+            <a href="#lyrics" class="nav-item" data-page="lyrics">Lyrics</a>
+            <a href="settings.html" class="nav-item">
+                <img src="images/icons/settings.png" alt="Settings" class="nav-icon">
+            </a>
+        </nav>
+    </header>
 
+    <!-- Main Content -->
+    <main>
+        <!-- Games Section -->
+        <section id="games" class="page-section active">
+            <h2>Games</h2>
+            <div id="games-container">
+                <!-- Game boxes will be dynamically generated -->
+                <p>Games coming soon...</p>
+            </div>
+        </section>
+
+        <!-- Library Section -->
+        <section id="library" class="page-section">
+            <h2>Library</h2>
+            <div id="library-container">
+                <a href="#" id="playlist-link" target="_blank">Open playlist in Spotify</a>
+                
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search...">
+                    <div class="search-dropdown">
+                        <button class="dropdown-toggle">
+                            <span id="search-type-label">Search by song</span>
+                            <img src="images/icons/dropdown.png" alt="Dropdown" class="dropdown-icon">
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li data-search-type="song">Search by song</li>
+                            <li data-search-type="album">Search by album</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="album-list">
+                    <!-- Albums will be dynamically generated -->
+                    <p>No songs loaded yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lyrics Section -->
+        <section id="lyrics" class="page-section">
+            <h2 id="lyrics-song-title">Select a song first</h2>
+            <div class="lyrics-controls">
+                <span class="sync-label">Sync</span>
+                <div class="toggle-switch" id="sync-toggle">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div id="lyrics-container">
+                <p id="lyrics-text">Select a song from the Library to see lyrics here.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Player Controls - Only on main.html -->
+    <div id="player-controls">
+        <div class="player-row-top">
+            <button id="shuffle-btn" class="player-btn">
+                <img src="images/icons/shuffle-off.png" alt="Shuffle" id="shuffle-icon">
+            </button>
+            <span id="current-song-name">-</span>
+            <button id="loop-btn" class="player-btn">
+                <img src="images/icons/loop-off.png" alt="Loop" id="loop-icon">
+            </button>
+        </div>
+        <div class="player-row-bottom">
+            <button id="prev-btn" class="player-btn">
+                <img src="images/icons/previous.png" alt="Previous">
+            </button>
+            <button id="rewind-btn" class="player-btn">
+                <img src="images/icons/rewind.png" alt="Rewind">
+            </button>
+            <button id="play-btn" class="player-btn play-btn-large">
+                <img src="images/icons/play.png" alt="Play" id="play-icon">
+            </button>
+            <button id="forward-btn" class="player-btn">
+                <img src="images/icons/forward.png" alt="Forward">
+            </button>
+            <button id="next-btn" class="player-btn">
+                <img src="images/icons/next.png" alt="Next">
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
