@@ -78,8 +78,8 @@ function checkFirstVisit() {
     const visited = localStorage.getItem('diljit_visited');
     if (visited === 'true') {
         state.isFirstVisit = false;
-        // If on root or index, stay. If on settings and not first visit, redirect to index
-        if (window.location.pathname.includes('settings.html') && !state.isFirstVisit) {
+        // If on settings.html and not first visit, redirect to index
+        if (window.location.pathname.includes('settings.html')) {
             window.location.href = 'index.html';
         }
     } else {
@@ -286,7 +286,7 @@ function setupSettingsPage() {
         });
     });
     
-    // Save button
+    // Save button - THIS redirects to home
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
             // Get name
