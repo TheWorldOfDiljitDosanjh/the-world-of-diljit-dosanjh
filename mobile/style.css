@@ -11,10 +11,22 @@ html, body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background-color: #f5f5f5;
     color: #000000;
-    padding-top: 60px;
-    padding-bottom: 120px;
     min-height: 100vh;
     transition: background-color 0.3s, color 0.3s;
+}
+
+/* Pages with player (main.html) need padding */
+body.has-player {
+    padding-top: 60px;
+    padding-bottom: 120px;
+}
+
+/* Pages without player (index.html, settings.html) */
+body.no-player {
+    padding-top: 60px;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Light Mode (Default) */
@@ -166,6 +178,7 @@ main {
     padding: 20px 16px;
     width: 100%;
     overflow-x: hidden;
+    flex: 1;
 }
 
 h1, h2 {
@@ -229,9 +242,11 @@ footer {
     color: #666666;
     font-size: 13px;
     border-top: 1px solid #e0e0e0;
-    margin-top: 20px;
     width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
     flex-shrink: 0;
+    background-color: inherit;
 }
 
 footer a {
@@ -792,10 +807,14 @@ body.dark-mode #lyrics-container {
 
 /* Responsive Scaling for Mobile - Prevent Zoom */
 @media screen and (max-width: 480px) {
-    body {
+    body.has-player {
         padding-top: 56px;
         padding-bottom: 110px;
-        font-size: 14px;
+    }
+    
+    body.no-player {
+        padding-top: 56px;
+        padding-bottom: 0;
     }
     
     header {
@@ -860,6 +879,11 @@ body.dark-mode #lyrics-container {
     
     .search-dropdown {
         min-width: 120px;
+    }
+    
+    footer {
+        padding: 12px 16px 10px;
+        font-size: 12px;
     }
 }
 
