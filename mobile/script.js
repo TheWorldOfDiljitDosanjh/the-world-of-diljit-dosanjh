@@ -97,57 +97,100 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// DOT ANIMATION WITH SAVED POSITION
+// DOT ANIMATION WITH SAVED POSITION - FIXED
 // ============================================
 
 function handleDotAnimation() {
-    const savedLeft = sessionStorage.getItem('diljit_dot_left');
     const slider = document.getElementById('slider-dot');
+    if (!slider) return;
     
-    if (savedLeft && slider) {
-        // Start the dot at the saved position (from previous page)
+    // Check for saved dot position from previous page
+    const savedLeft = sessionStorage.getItem('diljit_dot_left');
+    const savedPage = sessionStorage.getItem('diljit_current_page');
+    const currentPage = getCurrentPage();
+    
+    console.log('Saved dot position:', savedLeft);
+    console.log('Current page:', currentPage);
+    console.log('Saved page:', savedPage);
+    
+    if (savedLeft && savedPage && savedPage !== currentPage) {
+        // We're coming from a different page - animate the dot
         slider.style.left = savedLeft + 'px';
         slider.classList.add('visible');
         
-        // Then animate to the correct position for this page
+        // Wait a tiny bit, then animate to the correct position
         setTimeout(function() {
             updateSliderDot();
         }, 50);
         
-        // Clear the saved position so it doesn't affect future transitions
+        // Clear saved position so it doesn't affect future transitions
         sessionStorage.removeItem('diljit_dot_left');
+        sessionStorage.removeItem('diljit_current_page');
     } else {
         // Normal behavior - just show the dot in the correct position
         setTimeout(updateSliderDot, 50);
+        // Clear any stale saved data
+        sessionStorage.removeItem('diljit_dot_left');
+        sessionStorage.removeItem('diljit_current_page');
     }
 }
 
-// Save dot position before page unloads
-function saveDotPosition() {
+function getCurrentPage() {
+    const path = window.location.pathname;
+    if (path.includes('index.html') || path === '/' || path === '/mobile/') {
+        return 'home';
+    } else if (path.includes('settings.html')) {
+        return 'settings';
+    } else if (path.includes('main.html')) {
+        // For main.html, check which section is active
+        const activeSection = document.querySelector('.page-section.active');
+        if (activeSection) {
+            return activeSection.id;
+        }
+        return 'games'; // Default
+    }
+    return 'unknown';
+}
+
+// Save dot position and current page before navigating away
+function saveDotPositionAndNavigate(url) {
     const slider = document.getElementById('slider-dot');
     if (slider) {
         const left = slider.style.left;
         if (left) {
             sessionStorage.setItem('diljit_dot_left', left);
+            sessionStorage.setItem('diljit_current_page', getCurrentPage());
+            console.log('Saved dot position:', left);
+            console.log('Current page before navigation:', getCurrentPage());
         }
     }
+    // Navigate to the URL
+    window.location.href = url;
 }
 
-// Save position when clicking on nav links
+// Intercept clicks on nav items that go to different pages
 document.addEventListener('click', function(e) {
     const navLink = e.target.closest('.nav-item');
-    if (navLink && navLink.href) {
-        // Only save for links that go to different pages (not hash links on same page)
+    if (navLink) {
         const href = navLink.getAttribute('href');
+        // Only handle links that go to different pages (not hash links on same page)
         if (href && !href.startsWith('#')) {
-            saveDotPosition();
+            e.preventDefault(); // Prevent default navigation
+            saveDotPositionAndNavigate(href);
         }
     }
 });
 
-// Also save on page unload
+// Also save on page unload as a backup
 window.addEventListener('beforeunload', function() {
-    saveDotPosition();
+    const slider = document.getElementById('slider-dot');
+    if (slider) {
+        const left = slider.style.left;
+        if (left) {
+            sessionStorage.setItem('diljit_dot_left', left);
+            sessionStorage.setItem('diljit_current_page', getCurrentPage());
+        }
+    }
 });
 
 // ============================================
@@ -462,7 +505,7 @@ function setupSettingsPage() {
             state.isFirstVisit = false;
             
             // Redirect to home
-            window.location.href = 'index.html';
+            saveDotPositionAndNavigate('index.html');
         });
     }
     
