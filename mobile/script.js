@@ -87,11 +87,67 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup scroll position tracking
     setupScrollTracking();
     
-    // Update slider dot on load and resize
-    setTimeout(updateSliderDot, 50);
+    // Handle the dot animation with saved position
+    handleDotAnimation();
+    
+    // Update slider dot on resize
     window.addEventListener('resize', function() {
         updateSliderDot();
     });
+});
+
+// ============================================
+// DOT ANIMATION WITH SAVED POSITION
+// ============================================
+
+function handleDotAnimation() {
+    const savedLeft = sessionStorage.getItem('diljit_dot_left');
+    const slider = document.getElementById('slider-dot');
+    
+    if (savedLeft && slider) {
+        // Start the dot at the saved position (from previous page)
+        slider.style.left = savedLeft + 'px';
+        slider.classList.add('visible');
+        
+        // Then animate to the correct position for this page
+        setTimeout(function() {
+            updateSliderDot();
+        }, 50);
+        
+        // Clear the saved position so it doesn't affect future transitions
+        sessionStorage.removeItem('diljit_dot_left');
+    } else {
+        // Normal behavior - just show the dot in the correct position
+        setTimeout(updateSliderDot, 50);
+    }
+}
+
+// Save dot position before page unloads
+function saveDotPosition() {
+    const slider = document.getElementById('slider-dot');
+    if (slider) {
+        const left = slider.style.left;
+        if (left) {
+            sessionStorage.setItem('diljit_dot_left', left);
+        }
+    }
+}
+
+// Save position when clicking on nav links
+document.addEventListener('click', function(e) {
+    const navLink = e.target.closest('.nav-item');
+    if (navLink && navLink.href) {
+        // Only save for links that go to different pages (not hash links on same page)
+        const href = navLink.getAttribute('href');
+        if (href && !href.startsWith('#')) {
+            saveDotPosition();
+        }
+    }
+});
+
+// Also save on page unload
+window.addEventListener('beforeunload', function() {
+    saveDotPosition();
 });
 
 // ============================================
@@ -212,8 +268,6 @@ function setupNavigation() {
         if (homeLink) {
             homeLink.classList.add('active-text');
         }
-        // Update slider dot
-        setTimeout(updateSliderDot, 10);
     }
     
     // For settings.html, set settings as active
@@ -222,8 +276,6 @@ function setupNavigation() {
         if (settingsLink) {
             settingsLink.classList.add('active-text');
         }
-        // Update slider dot
-        setTimeout(updateSliderDot, 10);
     }
 }
 
@@ -285,7 +337,7 @@ function updateSliderDot() {
     // Calculate position relative to nav
     const left = navRect.left - navParentRect.left + (navRect.width / 2) - 3; // Center the dot (6px wide, so offset by 3px)
     
-    // Apply to slider
+    // Apply to slider with transition
     slider.style.left = left + 'px';
     slider.classList.add('visible');
 }
