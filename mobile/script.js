@@ -86,20 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup scroll position tracking
     setupScrollTracking();
-    
-    // Update slider on resize
-    window.addEventListener('resize', function() {
-        if (window.location.pathname.includes('main.html')) {
-            const activeSection = document.querySelector('.page-section.active');
-            if (activeSection) {
-                updateSlider(activeSection.id);
-            }
-        }
-    });
 });
 
 // ============================================
-// FIRST VISIT CHECK
+// FIRST VISIT CHECK - UPDATED
 // ============================================
 
 function checkFirstVisit() {
@@ -122,7 +112,7 @@ function checkFirstVisit() {
 }
 
 // ============================================
-// PLAYER STATE MANAGEMENT
+// PLAYER STATE MANAGEMENT (NEW)
 // ============================================
 
 function loadPlayerState() {
@@ -145,7 +135,7 @@ function savePlayerState() {
 }
 
 // ============================================
-// LYRICS STATE MANAGEMENT
+// LYRICS STATE MANAGEMENT (NEW)
 // ============================================
 
 function loadLyricsState() {
@@ -212,7 +202,7 @@ function setupNavigation() {
     
     // For index.html, set home as active
     if (currentPath.includes('index.html') || currentPath === '/' || currentPath === '/mobile/') {
-        const homeLink = document.querySelector('.nav-item[data-page="home"]');
+        const homeLink = document.querySelector('.nav-item[href="index.html"]');
         if (homeLink) {
             homeLink.classList.add('active-icon');
         }
@@ -220,7 +210,7 @@ function setupNavigation() {
     
     // For settings.html, set settings as active
     if (currentPath.includes('settings.html')) {
-        const settingsLink = document.querySelector('.nav-item[data-page="settings"]');
+        const settingsLink = document.querySelector('.nav-item[href="settings.html"]');
         if (settingsLink) {
             settingsLink.classList.add('active-icon');
         }
@@ -233,7 +223,7 @@ function switchMainSection(section) {
         sec.classList.remove('active');
     });
     
-    // Remove active-text from all nav items
+    // Remove active from all nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active-text', 'active-icon');
     });
@@ -244,7 +234,7 @@ function switchMainSection(section) {
         targetSection.classList.add('active');
         state.currentPage = section;
         
-        // Update header nav
+        // Update header nav - only for text items
         const navLinks = document.querySelectorAll('.nav-item[data-page]');
         navLinks.forEach(link => {
             if (link.dataset.page === section) {
@@ -252,51 +242,12 @@ function switchMainSection(section) {
             }
         });
         
-        // Update slider line position
-        updateSlider(section);
-        
         // Restore scroll position for this section
         const savedPos = state.scrollPositions[section] || 0;
         setTimeout(() => {
             window.scrollTo(0, savedPos);
         }, 50);
     }
-}
-
-// ============================================
-// SLIDER LINE ANIMATION
-// ============================================
-
-function updateSlider(activePage) {
-    const slider = document.getElementById('slider-line');
-    if (!slider) return;
-    
-    // Find the active nav item
-    const activeNav = document.querySelector(`.nav-item[data-page="${activePage}"]`);
-    if (!activeNav) {
-        slider.classList.remove('visible');
-        return;
-    }
-    
-    // Only show slider for text items (Games, Library, Lyrics)
-    const textPages = ['games', 'library', 'lyrics'];
-    if (!textPages.includes(activePage)) {
-        slider.classList.remove('visible');
-        return;
-    }
-    
-    // Get position of the nav item
-    const navRect = activeNav.getBoundingClientRect();
-    const navParentRect = activeNav.closest('nav').getBoundingClientRect();
-    
-    // Calculate position relative to nav
-    const left = navRect.left - navParentRect.left;
-    const width = navRect.width;
-    
-    // Apply to slider
-    slider.style.left = left + 'px';
-    slider.style.width = width + 'px';
-    slider.classList.add('visible');
 }
 
 // ============================================
@@ -555,7 +506,7 @@ function performSearch(query) {
 }
 
 // ============================================
-// LYRICS
+// LYRICS - UPDATED WITH PERSISTENT SYNC
 // ============================================
 
 function setupLyrics() {
@@ -600,7 +551,7 @@ function setupGames() {
 }
 
 // ============================================
-// PLAYER CONTROLS
+// PLAYER CONTROLS - UPDATED WITH PERSISTENT STATE
 // ============================================
 
 function setupPlayerControls() {
@@ -663,7 +614,7 @@ function setupPlayerControls() {
         });
     }
     
-    // Shuffle
+    // Shuffle - UPDATED with save
     if (shuffleBtn && shuffleIcon) {
         shuffleBtn.addEventListener('click', function() {
             state.player.shuffle = !state.player.shuffle;
@@ -679,7 +630,7 @@ function setupPlayerControls() {
         });
     }
     
-    // Loop
+    // Loop - UPDATED with save
     if (loopBtn && loopIcon) {
         loopBtn.addEventListener('click', function() {
             const loopStates = ['off', 'on', 'single'];
