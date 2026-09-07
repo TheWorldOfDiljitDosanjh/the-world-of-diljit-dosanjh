@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Main - World of Diljit Dosanjh</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,15 +10,17 @@
     <!-- Sticky Header -->
     <header>
         <nav>
-            <a href="index.html" class="nav-item">
+            <a href="index.html" class="nav-item" data-page="home">
                 <img src="images/icons/home.png" alt="Home" class="nav-icon">
             </a>
             <a href="#games" class="nav-item active-text" data-page="games">Games</a>
             <a href="#library" class="nav-item" data-page="library">Library</a>
             <a href="#lyrics" class="nav-item" data-page="lyrics">Lyrics</a>
-            <a href="settings.html" class="nav-item">
+            <a href="settings.html" class="nav-item" data-page="settings">
                 <img src="images/icons/settings.png" alt="Settings" class="nav-icon">
             </a>
+            <!-- Sliding dot for all header items -->
+            <div class="slider-dot" id="slider-dot"></div>
         </nav>
     </header>
 
