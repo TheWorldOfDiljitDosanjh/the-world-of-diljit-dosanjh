@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup scroll position tracking
     setupScrollTracking();
     
-    // Update slider dot on resize
+    // Update slider dot on load and resize
+    setTimeout(updateSliderDot, 50);
     window.addEventListener('resize', function() {
         updateSliderDot();
     });
