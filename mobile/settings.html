@@ -10,16 +10,17 @@
     <!-- Sticky Header -->
     <header>
         <nav>
-            <a href="index.html" class="nav-item">
+            <a href="index.html" class="nav-item" data-page="home">
                 <img src="images/icons/home.png" alt="Home" class="nav-icon">
             </a>
-            <a href="main.html#games" class="nav-item">Games</a>
-            <a href="main.html#library" class="nav-item">Library</a>
-            <a href="main.html#lyrics" class="nav-item">Lyrics</a>
-            <a href="settings.html" class="nav-item active-icon">
+            <a href="main.html#games" class="nav-item" data-page="games">Games</a>
+            <a href="main.html#library" class="nav-item" data-page="library">Library</a>
+            <a href="main.html#lyrics" class="nav-item" data-page="lyrics">Lyrics</a>
+            <a href="settings.html" class="nav-item active-text" data-page="settings">
                 <img src="images/icons/settings.png" alt="Settings" class="nav-icon">
-                <span class="active-dot"></span>
             </a>
+            <!-- Sliding dot for all header items -->
+            <div class="slider-dot" id="slider-dot"></div>
         </nav>
     </header>
 
