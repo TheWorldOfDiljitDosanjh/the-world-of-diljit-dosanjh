@@ -23,6 +23,9 @@ const state = {
         shuffle: false,
         loop: 'off' // 'off', 'on', 'single'
     },
+    lyrics: {
+        sync: false
+    },
     isFirstVisit: true,
     currentPage: 'games', // 'games', 'library', 'lyrics'
     searchPreference: 'song',
@@ -48,11 +51,17 @@ const DOM = {};
 document.addEventListener('DOMContentLoaded', function() {
     console.log('World of Diljit Dosanjh - Mobile App Loaded');
     
-    // Check if it's first visit
+    // Check if it's first visit - THIS MUST RUN FIRST
     checkFirstVisit();
     
     // Initialize settings
     loadSettings();
+    
+    // Load player state
+    loadPlayerState();
+    
+    // Load lyrics state
+    loadLyricsState();
     
     // Apply theme
     applyTheme();
@@ -80,95 +89,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// FIRST VISIT CHECK - FIXED
+// FIRST VISIT CHECK - UPDATED
 // ============================================
 
 function checkFirstVisit() {
     const visited = localStorage.getItem('diljit_visited');
+    const currentPath = window.location.pathname;
+    const isSettingsPage = currentPath.includes('settings.html');
     
     if (visited === 'true') {
         state.isFirstVisit = false;
-        // Don't redirect from settings if we're already there
-        // Let the user freely navigate
+        // Allow access to all pages
     } else {
         state.isFirstVisit = true;
-        // If not on settings.html, redirect to settings
-        // But only if we're not already on settings
-        const currentPath = window.location.pathname;
-        if (!currentPath.includes('settings.html') && !currentPath.includes('main.html')) {
-            // Only redirect from home page
-            if (currentPath.includes('index.html') || currentPath === '/' || currentPath === '/mobile/') {
-                window.location.href = 'settings.html';
-            }
+        
+        // If NOT on settings page, redirect to settings
+        if (!isSettingsPage) {
+            window.location.href = 'settings.html';
+            return; // Stop execution
         }
     }
 }
 
 // ============================================
-// SCROLL POSITION TRACKING
+// PLAYER STATE MANAGEMENT (NEW)
 // ============================================
 
-function setupScrollTracking() {
-    // Track scroll position on home page
-    const homeContent = document.getElementById('home-content');
-    if (homeContent) {
-        // Restore scroll position
-        const savedPos = state.scrollPositions.home || 0;
-        window.scrollTo(0, savedPos);
-        
-        // Save on scroll
-        window.addEventListener('scroll', function() {
-            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
-                state.scrollPositions.home = window.scrollY;
-            }
-        });
+function loadPlayerState() {
+    // Load shuffle state
+    const shuffleSaved = localStorage.getItem('diljit_shuffle');
+    if (shuffleSaved !== null) {
+        state.player.shuffle = shuffleSaved === 'true';
     }
     
-    // Track scroll on main page sections
-    if (window.location.pathname.includes('main.html')) {
-        // Save scroll positions when switching sections
-        const sections = ['games', 'library', 'lyrics'];
-        sections.forEach(sectionId => {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                // Restore scroll position when section becomes active
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                            if (section.classList.contains('active')) {
-                                const savedPos = state.scrollPositions[sectionId] || 0;
-                                window.scrollTo(0, savedPos);
-                            } else {
-                                // Save position when leaving
-                                state.scrollPositions[sectionId] = window.scrollY;
-                            }
-                        }
-                    });
-                });
-                
-                observer.observe(section, { attributes: true });
-            }
-        });
-        
-        // Also save on scroll
-        window.addEventListener('scroll', function() {
-            const activeSection = document.querySelector('.page-section.active');
-            if (activeSection) {
-                const sectionId = activeSection.id;
-                state.scrollPositions[sectionId] = window.scrollY;
-            }
-        });
+    // Load loop state
+    const loopSaved = localStorage.getItem('diljit_loop');
+    if (loopSaved) {
+        state.player.loop = loopSaved;
     }
-    
-    // Track settings page scroll
-    if (window.location.pathname.includes('settings.html')) {
-        const savedPos = state.scrollPositions.settings || 0;
-        window.scrollTo(0, savedPos);
-        
-        window.addEventListener('scroll', function() {
-            state.scrollPositions.settings = window.scrollY;
-        });
+}
+
+function savePlayerState() {
+    localStorage.setItem('diljit_shuffle', state.player.shuffle);
+    localStorage.setItem('diljit_loop', state.player.loop);
+}
+
+// ============================================
+// LYRICS STATE MANAGEMENT (NEW)
+// ============================================
+
+function loadLyricsState() {
+    const syncSaved = localStorage.getItem('diljit_sync');
+    if (syncSaved !== null) {
+        state.lyrics.sync = syncSaved === 'true';
     }
+}
+
+function saveLyricsState() {
+    localStorage.setItem('diljit_sync', state.lyrics.sync);
 }
 
 // ============================================
@@ -340,6 +318,7 @@ function setupSettingsPage() {
             const isDark = this.classList.contains('active');
             state.settings.theme = isDark ? 'dark' : 'light';
             applyTheme();
+            saveSettings();
         });
     }
     
@@ -349,6 +328,7 @@ function setupSettingsPage() {
             serviceBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             state.settings.musicService = this.dataset.service;
+            saveSettings();
         });
     });
     
@@ -358,6 +338,7 @@ function setupSettingsPage() {
             rewindBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             state.settings.rewindSeconds = parseInt(this.dataset.seconds);
+            saveSettings();
         });
     });
     
@@ -367,6 +348,7 @@ function setupSettingsPage() {
             forwardBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             state.settings.forwardSeconds = parseInt(this.dataset.seconds);
+            saveSettings();
         });
     });
     
@@ -407,6 +389,9 @@ function setupSettingsPage() {
                     rewindSeconds: 10,
                     forwardSeconds: 10
                 };
+                state.player.shuffle = false;
+                state.player.loop = 'off';
+                state.lyrics.sync = false;
                 state.isFirstVisit = true;
                 
                 // Reload page to show first visit state
@@ -521,7 +506,7 @@ function performSearch(query) {
 }
 
 // ============================================
-// LYRICS
+// LYRICS - UPDATED WITH PERSISTENT SYNC
 // ============================================
 
 function setupLyrics() {
@@ -529,9 +514,21 @@ function setupLyrics() {
     const lyricsContainer = document.getElementById('lyrics-container');
     
     if (syncToggle) {
+        // Restore sync state
+        if (state.lyrics.sync) {
+            syncToggle.classList.add('active');
+            if (lyricsContainer) {
+                lyricsContainer.classList.add('lyrics-sync-on');
+            }
+        }
+        
         syncToggle.addEventListener('click', function() {
             this.classList.toggle('active');
             const isSyncOn = this.classList.contains('active');
+            
+            // Update state
+            state.lyrics.sync = isSyncOn;
+            saveLyricsState();
             
             if (isSyncOn) {
                 lyricsContainer.classList.add('lyrics-sync-on');
@@ -554,7 +551,7 @@ function setupGames() {
 }
 
 // ============================================
-// PLAYER CONTROLS
+// PLAYER CONTROLS - UPDATED WITH PERSISTENT STATE
 // ============================================
 
 function setupPlayerControls() {
@@ -572,6 +569,30 @@ function setupPlayerControls() {
     
     // Default state - empty
     currentSongName.textContent = '-';
+    
+    // Restore shuffle state
+    if (shuffleIcon) {
+        if (state.player.shuffle) {
+            shuffleIcon.src = 'images/icons/shuffle-on.png';
+        } else {
+            shuffleIcon.src = 'images/icons/shuffle-off.png';
+        }
+    }
+    
+    // Restore loop state
+    if (loopIcon) {
+        switch(state.player.loop) {
+            case 'off':
+                loopIcon.src = 'images/icons/loop-off.png';
+                break;
+            case 'on':
+                loopIcon.src = 'images/icons/loop-on.png';
+                break;
+            case 'single':
+                loopIcon.src = 'images/icons/loop-single.png';
+                break;
+        }
+    }
     
     // Play/Pause
     if (playBtn && playIcon) {
@@ -593,10 +614,12 @@ function setupPlayerControls() {
         });
     }
     
-    // Shuffle
+    // Shuffle - UPDATED with save
     if (shuffleBtn && shuffleIcon) {
         shuffleBtn.addEventListener('click', function() {
             state.player.shuffle = !state.player.shuffle;
+            savePlayerState();
+            
             if (state.player.shuffle) {
                 shuffleIcon.src = 'images/icons/shuffle-on.png';
                 // TODO: Shuffle queue
@@ -607,13 +630,14 @@ function setupPlayerControls() {
         });
     }
     
-    // Loop
+    // Loop - UPDATED with save
     if (loopBtn && loopIcon) {
         loopBtn.addEventListener('click', function() {
             const loopStates = ['off', 'on', 'single'];
             const currentIndex = loopStates.indexOf(state.player.loop);
             const nextIndex = (currentIndex + 1) % loopStates.length;
             state.player.loop = loopStates[nextIndex];
+            savePlayerState();
             
             switch(state.player.loop) {
                 case 'off':
@@ -666,6 +690,73 @@ function setupPlayerControls() {
         forwardBtn.addEventListener('click', function() {
             console.log(`Forward ${state.settings.forwardSeconds} seconds`);
             // TODO: Forward audio by forwardSeconds
+        });
+    }
+}
+
+// ============================================
+// SCROLL POSITION TRACKING
+// ============================================
+
+function setupScrollTracking() {
+    // Track scroll position on home page
+    const homeContent = document.getElementById('home-content');
+    if (homeContent) {
+        // Restore scroll position
+        const savedPos = state.scrollPositions.home || 0;
+        window.scrollTo(0, savedPos);
+        
+        // Save on scroll
+        window.addEventListener('scroll', function() {
+            if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
+                state.scrollPositions.home = window.scrollY;
+            }
+        });
+    }
+    
+    // Track scroll on main page sections
+    if (window.location.pathname.includes('main.html')) {
+        // Save scroll positions when switching sections
+        const sections = ['games', 'library', 'lyrics'];
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Restore scroll position when section becomes active
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            if (section.classList.contains('active')) {
+                                const savedPos = state.scrollPositions[sectionId] || 0;
+                                window.scrollTo(0, savedPos);
+                            } else {
+                                // Save position when leaving
+                                state.scrollPositions[sectionId] = window.scrollY;
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(section, { attributes: true });
+            }
+        });
+        
+        // Also save on scroll
+        window.addEventListener('scroll', function() {
+            const activeSection = document.querySelector('.page-section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id;
+                state.scrollPositions[sectionId] = window.scrollY;
+            }
+        });
+    }
+    
+    // Track settings page scroll
+    if (window.location.pathname.includes('settings.html')) {
+        const savedPos = state.scrollPositions.settings || 0;
+        window.scrollTo(0, savedPos);
+        
+        window.addEventListener('scroll', function() {
+            state.scrollPositions.settings = window.scrollY;
         });
     }
 }
