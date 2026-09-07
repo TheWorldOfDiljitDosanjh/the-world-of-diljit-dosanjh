@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>World of Diljit Dosanjh</title>
+    <title>Settings - World of Diljit Dosanjh</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Sticky Header -->
     <header>
         <nav>
-            <a href="index.html" class="nav-item active-icon" data-page="home">
+            <a href="index.html" class="nav-item" data-page="home">
                 <img src="images/icons/home.png" alt="Home" class="nav-icon">
                 <span class="active-dot"></span>
             </a>
             <a href="main.html#games" class="nav-item" data-page="games">Games</a>
             <a href="main.html#library" class="nav-item" data-page="library">Library</a>
             <a href="main.html#lyrics" class="nav-item" data-page="lyrics">Lyrics</a>
-            <a href="settings.html" class="nav-item" data-page="settings">
+            <a href="settings.html" class="nav-item active-icon" data-page="settings">
                 <img src="images/icons/settings.png" alt="Settings" class="nav-icon">
                 <span class="active-dot"></span>
             </a>
@@ -28,35 +28,83 @@
 
     <!-- Main Content -->
     <main>
-        <section id="home-content">
-            <div class="welcome-container">
-                <h1>Welcome, <span id="user-name-display">Fan</span>, to</h1>
-                <h1 class="website-title">The World of Diljit Dosanjh</h1>
-            </div>
+        <section id="settings-content">
+            <h1>Settings</h1>
             
-            <div class="content-block">
-                <p>Diljit Dosanjh is a Punjabi singer, actor, and television personality. Known for his powerful voice and charismatic stage presence, he has become one of the most prominent figures in Punjabi music and cinema. With a career spanning over two decades, Diljit has released numerous hit albums and starred in critically acclaimed films, earning him a devoted global fanbase.</p>
+            <div class="settings-group" id="name-setting">
+                <label for="user-name">Your Name</label>
+                <input type="text" id="user-name" placeholder="Enter your name" required>
+                <div class="help-box" id="help-name">
+                    <span class="help-arrow">⬆</span>
+                    <p>Enter your name here. This will be used to personalize your experience on the home page.</p>
+                </div>
             </div>
-            
-            <div class="content-block image-block">
-                <img src="images/diljit.jpg" alt="Diljit Dosanjh" class="home-image">
+
+            <div class="settings-group" id="theme-setting">
+                <label>Theme</label>
+                <div class="toggle-container">
+                    <span class="toggle-label">Light</span>
+                    <div class="toggle-switch" id="theme-toggle">
+                        <div class="toggle-knob"></div>
+                    </div>
+                    <span class="toggle-label">Dark</span>
+                </div>
+                <div class="help-box" id="help-theme">
+                    <span class="help-arrow">⬆</span>
+                    <p>Switch between Light mode (white background, black text) and Dark mode (dark background, white text).</p>
+                </div>
             </div>
-            
-            <div class="content-block">
-                <h2>About Me</h2>
-                <p>I am his 7th biggest listener globally, in his top 0.001% of listeners, and have Diljit as my most streamed artist of all time.</p>
+
+            <div class="settings-group" id="service-setting">
+                <label>Music Service</label>
+                <div class="service-selector">
+                    <button class="service-btn active" data-service="spotify">
+                        <img src="images/icons/spotify.png" alt="Spotify" class="service-icon">
+                        Spotify
+                    </button>
+                    <button class="service-btn" data-service="youtube">
+                        <img src="images/icons/youtube.png" alt="YouTube" class="service-icon">
+                        YouTube
+                    </button>
+                </div>
+                <div class="help-box" id="help-service">
+                    <span class="help-arrow">⬆</span>
+                    <p>Choose your preferred music service. This will affect the playlist link shown in the Library.</p>
+                </div>
             </div>
-            
-            <div class="content-block image-block">
-                <img src="images/proof.jpg" alt="Proof of 7th biggest listener" class="home-image">
+
+            <div class="settings-group" id="rewind-setting">
+                <label>Rewind Seconds</label>
+                <div class="seconds-selector">
+                    <button class="sec-btn" data-seconds="5">5s</button>
+                    <button class="sec-btn active" data-seconds="10">10s</button>
+                    <button class="sec-btn" data-seconds="15">15s</button>
+                </div>
+                <div class="help-box" id="help-rewind">
+                    <span class="help-arrow">⬆</span>
+                    <p>Set how many seconds to rewind when you press the rewind button on the player.</p>
+                </div>
+            </div>
+
+            <div class="settings-group" id="forward-setting">
+                <label>Forward Seconds</label>
+                <div class="seconds-selector">
+                    <button class="sec-btn" data-seconds="5">5s</button>
+                    <button class="sec-btn active" data-seconds="10">10s</button>
+                    <button class="sec-btn" data-seconds="15">15s</button>
+                </div>
+                <div class="help-box" id="help-forward">
+                    <span class="help-arrow">⬆</span>
+                    <p>Set how many seconds to forward when you press the forward button on the player.</p>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button id="save-settings" class="btn-primary">Save Settings</button>
+                <button id="reset-settings" class="btn-danger">Reset All Data</button>
             </div>
         </section>
     </main>
-
-    <!-- Footer - Home Page Only -->
-    <footer>
-        <p>theworldofdiljitdosanjh@gmail.com</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
