@@ -87,110 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup scroll position tracking
     setupScrollTracking();
     
-    // Handle the dot animation with saved position
-    handleDotAnimation();
-    
-    // Update slider dot on resize
-    window.addEventListener('resize', function() {
-        updateSliderDot();
-    });
-});
-
-// ============================================
-// DOT ANIMATION WITH SAVED POSITION - FIXED
-// ============================================
-
-function handleDotAnimation() {
-    const slider = document.getElementById('slider-dot');
-    if (!slider) return;
-    
-    // Check for saved dot position from previous page
-    const savedLeft = sessionStorage.getItem('diljit_dot_left');
-    const savedPage = sessionStorage.getItem('diljit_current_page');
-    const currentPage = getCurrentPage();
-    
-    console.log('Saved dot position:', savedLeft);
-    console.log('Current page:', currentPage);
-    console.log('Saved page:', savedPage);
-    
-    if (savedLeft && savedPage && savedPage !== currentPage) {
-        // We're coming from a different page - animate the dot
-        slider.style.left = savedLeft + 'px';
-        slider.classList.add('visible');
-        
-        // Wait a tiny bit, then animate to the correct position
-        setTimeout(function() {
-            updateSliderDot();
-        }, 50);
-        
-        // Clear saved position so it doesn't affect future transitions
-        sessionStorage.removeItem('diljit_dot_left');
-        sessionStorage.removeItem('diljit_current_page');
-    } else {
-        // Normal behavior - just show the dot in the correct position
-        setTimeout(updateSliderDot, 50);
-        // Clear any stale saved data
-        sessionStorage.removeItem('diljit_dot_left');
-        sessionStorage.removeItem('diljit_current_page');
-    }
-}
-
-function getCurrentPage() {
-    const path = window.location.pathname;
-    if (path.includes('index.html') || path === '/' || path === '/mobile/') {
-        return 'home';
-    } else if (path.includes('settings.html')) {
-        return 'settings';
-    } else if (path.includes('main.html')) {
-        // For main.html, check which section is active
-        const activeSection = document.querySelector('.page-section.active');
-        if (activeSection) {
-            return activeSection.id;
-        }
-        return 'games'; // Default
-    }
-    return 'unknown';
-}
-
-// Save dot position and current page before navigating away
-function saveDotPositionAndNavigate(url) {
-    const slider = document.getElementById('slider-dot');
-    if (slider) {
-        const left = slider.style.left;
-        if (left) {
-            sessionStorage.setItem('diljit_dot_left', left);
-            sessionStorage.setItem('diljit_current_page', getCurrentPage());
-            console.log('Saved dot position:', left);
-            console.log('Current page before navigation:', getCurrentPage());
-        }
-    }
-    // Navigate to the URL
-    window.location.href = url;
-}
-
-// Intercept clicks on nav items that go to different pages
-document.addEventListener('click', function(e) {
-    const navLink = e.target.closest('.nav-item');
-    if (navLink) {
-        const href = navLink.getAttribute('href');
-        // Only handle links that go to different pages (not hash links on same page)
-        if (href && !href.startsWith('#')) {
-            e.preventDefault(); // Prevent default navigation
-            saveDotPositionAndNavigate(href);
-        }
-    }
-});
-
-// Also save on page unload as a backup
-window.addEventListener('beforeunload', function() {
-    const slider = document.getElementById('slider-dot');
-    if (slider) {
-        const left = slider.style.left;
-        if (left) {
-            sessionStorage.setItem('diljit_dot_left', left);
-            sessionStorage.setItem('diljit_current_page', getCurrentPage());
-        }
-    }
+    // Show the dot in the correct position on page load
+    setTimeout(updateDotPosition, 50);
 });
 
 // ============================================
@@ -311,6 +209,7 @@ function setupNavigation() {
         if (homeLink) {
             homeLink.classList.add('active-text');
         }
+        setTimeout(updateDotPosition, 10);
     }
     
     // For settings.html, set settings as active
@@ -319,6 +218,7 @@ function setupNavigation() {
         if (settingsLink) {
             settingsLink.classList.add('active-text');
         }
+        setTimeout(updateDotPosition, 10);
     }
 }
 
@@ -347,8 +247,8 @@ function switchMainSection(section) {
             }
         });
         
-        // Update slider dot position
-        updateSliderDot();
+        // Update dot position (animates between Games/Library/Lyrics)
+        updateDotPosition();
         
         // Restore scroll position for this section
         const savedPos = state.scrollPositions[section] || 0;
@@ -359,10 +259,10 @@ function switchMainSection(section) {
 }
 
 // ============================================
-// SLIDER DOT ANIMATION - ONE DOT FOR ALL PAGES
+// DOT POSITION - ONLY ANIMATES ON MAIN PAGE SECTIONS
 // ============================================
 
-function updateSliderDot() {
+function updateDotPosition() {
     const slider = document.getElementById('slider-dot');
     if (!slider) return;
     
@@ -373,6 +273,14 @@ function updateSliderDot() {
         return;
     }
     
+    // Get the current page
+    const currentPage = activeNav.dataset.page;
+    
+    // Only animate for Games, Library, Lyrics (they're on the same page)
+    // For Home and Settings, just show the dot instantly with no animation
+    const animatePages = ['games', 'library', 'lyrics'];
+    const shouldAnimate = animatePages.includes(currentPage);
+    
     // Get position of the active nav item
     const navRect = activeNav.getBoundingClientRect();
     const navParentRect = activeNav.closest('nav').getBoundingClientRect();
@@ -380,9 +288,18 @@ function updateSliderDot() {
     // Calculate position relative to nav
     const left = navRect.left - navParentRect.left + (navRect.width / 2) - 3; // Center the dot (6px wide, so offset by 3px)
     
-    // Apply to slider with transition
+    // Apply to slider
     slider.style.left = left + 'px';
     slider.classList.add('visible');
+    
+    // If it's an animate page, ensure transition is enabled
+    // If it's Home or Settings, disable transition for instant jump
+    if (!shouldAnimate) {
+        slider.style.transition = 'none';
+        // Force reflow, then re-enable transition
+        void slider.offsetHeight;
+        slider.style.transition = 'left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    }
 }
 
 // ============================================
@@ -505,7 +422,7 @@ function setupSettingsPage() {
             state.isFirstVisit = false;
             
             // Redirect to home
-            saveDotPositionAndNavigate('index.html');
+            window.location.href = 'index.html';
         });
     }
     
