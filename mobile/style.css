@@ -881,6 +881,7 @@ body.dark-mode #lyrics-container {
     
     .search-dropdown {
         min-width: 120px;
+        z-index: 100;
     }
     
     footer {
