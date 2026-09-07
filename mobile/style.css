@@ -609,6 +609,7 @@ body.dark-mode #search-input {
     position: relative;
     min-width: 140px;
     flex-shrink: 0;
+    z-index: 100;
 }
 
 .dropdown-toggle {
@@ -653,8 +654,9 @@ body.light-mode .dropdown-icon {
     margin-top: 4px;
     list-style: none;
     padding: 4px 0;
-    z-index: 10;
+    z-index: 999;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: visible;
 }
 
 body.dark-mode .dropdown-menu {
