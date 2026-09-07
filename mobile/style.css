@@ -11,8 +11,8 @@ html, body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background-color: #f5f5f5;
     color: #000000;
-    padding-top: 60px; /* Space for sticky header */
-    padding-bottom: 120px; /* Space for player controls */
+    padding-top: 60px;
+    padding-bottom: 120px;
     min-height: 100vh;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -51,6 +51,10 @@ body.light-mode .help-box {
     color: #000000;
 }
 
+body.light-mode .slider-dot {
+    background-color: #158edd;
+}
+
 /* Dark Mode */
 body.dark-mode {
     background-color: #1a1a1a;
@@ -77,6 +81,10 @@ body.dark-mode .help-box {
     color: #ffffff;
 }
 
+body.dark-mode .slider-dot {
+    background-color: #158edd;
+}
+
 /* Sticky Header */
 header {
     position: fixed;
@@ -100,6 +108,7 @@ nav {
     width: 100%;
     padding: 0 16px;
     height: 100%;
+    position: relative;
 }
 
 .nav-item {
@@ -122,36 +131,32 @@ nav {
     display: block;
 }
 
-/* Active Indicator - Dot for icons */
-.nav-item.active-icon .active-dot {
-    display: block;
-}
-
-.active-dot {
-    display: none;
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #158edd;
-}
-
-/* Active Indicator - Underline for text */
+/* Active color for text items */
 .nav-item.active-text {
     color: #158edd;
 }
 
-.nav-item.active-text::after {
-    content: '';
+/* Sliding Dot - Moves between ALL header items */
+.slider-dot {
     position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
+    bottom: -6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     background-color: #158edd;
+    transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.slider-dot.visible {
+    display: block;
+}
+
+/* Remove individual dots from nav items - they're all handled by slider now */
+.nav-item .active-dot {
+    display: none !important;
 }
 
 /* Main Content */
