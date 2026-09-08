@@ -16,19 +16,22 @@ const state = {
     },
     player: {
         currentSong: null,
+        currentAlbum: null,
         currentIndex: -1,
         isPlaying: false,
         position: 0,
         queue: [],
         shuffle: true,
-        loop: 'on' // 'off', 'on', 'single'
+        loop: 'on', // 'off', 'on', 'single'
+        audio: null
     },
     lyrics: {
         sync: false
     },
     isFirstVisit: true,
-    currentPage: 'games', // 'games', 'library', 'lyrics'
+    currentPage: 'games',
     searchPreference: 'song',
+    songsData: null,
     scrollPositions: {
         home: 0,
         games: 0,
@@ -51,43 +54,26 @@ const DOM = {};
 document.addEventListener('DOMContentLoaded', function() {
     console.log('World of Diljit Dosanjh - Mobile App Loaded');
     
-    // Check if it's first visit - THIS MUST RUN FIRST
     checkFirstVisit();
-    
-    // Initialize settings
     loadSettings();
-    
-    // Load player state
     loadPlayerState();
-    
-    // Load lyrics state
     loadLyricsState();
-    
-    // Apply theme
     applyTheme();
-    
-    // Setup navigation
     setupNavigation();
     
-    // Setup settings page if on settings.html
     if (window.location.pathname.includes('settings.html')) {
         setupSettingsPage();
     }
     
-    // Setup main page if on main.html
     if (window.location.pathname.includes('main.html')) {
         setupMainPage();
     }
     
-    // Setup home page if on index.html
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
         setupHomePage();
     }
     
-    // Setup scroll position tracking
     setupScrollTracking();
-    
-    // Show the dot in the correct position on page load
     setTimeout(updateDotPosition, 50);
 });
 
@@ -102,14 +88,11 @@ function checkFirstVisit() {
     
     if (visited === 'true') {
         state.isFirstVisit = false;
-        // Allow access to all pages
     } else {
         state.isFirstVisit = true;
-        
-        // If NOT on settings page, redirect to settings
         if (!isSettingsPage) {
             window.location.href = 'settings.html';
-            return; // Stop execution
+            return;
         }
     }
 }
@@ -119,13 +102,11 @@ function checkFirstVisit() {
 // ============================================
 
 function loadPlayerState() {
-    // Load shuffle state
     const shuffleSaved = localStorage.getItem('diljit_shuffle');
     if (shuffleSaved !== null) {
         state.player.shuffle = shuffleSaved === 'true';
     }
     
-    // Load loop state
     const loopSaved = localStorage.getItem('diljit_loop');
     if (loopSaved) {
         state.player.loop = loopSaved;
@@ -191,19 +172,16 @@ function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const currentPath = window.location.pathname;
     
-    // For main.html, handle section switching
     if (currentPath.includes('main.html')) {
         const hash = window.location.hash || '#games';
         switchMainSection(hash.replace('#', ''));
         
-        // Listen for hash changes
         window.addEventListener('hashchange', function() {
             const newHash = window.location.hash.replace('#', '');
             switchMainSection(newHash);
         });
     }
     
-    // For index.html, set home as active
     if (currentPath.includes('index.html') || currentPath === '/' || currentPath === '/mobile/') {
         const homeLink = document.querySelector('.nav-item[data-page="home"]');
         if (homeLink) {
@@ -212,7 +190,6 @@ function setupNavigation() {
         setTimeout(updateDotPosition, 10);
     }
     
-    // For settings.html, set settings as active
     if (currentPath.includes('settings.html')) {
         const settingsLink = document.querySelector('.nav-item[data-page="settings"]');
         if (settingsLink) {
@@ -223,23 +200,19 @@ function setupNavigation() {
 }
 
 function switchMainSection(section) {
-    // Remove active from all sections
     document.querySelectorAll('.page-section').forEach(sec => {
         sec.classList.remove('active');
     });
     
-    // Remove active-text from all nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active-text');
     });
     
-    // Activate the selected section
     const targetSection = document.getElementById(section);
     if (targetSection) {
         targetSection.classList.add('active');
         state.currentPage = section;
         
-        // Update header nav - ALL items use active-text now
         const navLinks = document.querySelectorAll('.nav-item[data-page]');
         navLinks.forEach(link => {
             if (link.dataset.page === section) {
@@ -247,10 +220,8 @@ function switchMainSection(section) {
             }
         });
         
-        // Update dot position (animates between Games/Library/Lyrics)
         updateDotPosition();
         
-        // Restore scroll position for this section
         const savedPos = state.scrollPositions[section] || 0;
         setTimeout(() => {
             window.scrollTo(0, savedPos);
@@ -259,44 +230,33 @@ function switchMainSection(section) {
 }
 
 // ============================================
-// DOT POSITION - ONLY ANIMATES ON MAIN PAGE SECTIONS
+// DOT POSITION
 // ============================================
 
 function updateDotPosition() {
     const slider = document.getElementById('slider-dot');
     if (!slider) return;
     
-    // Find which page is currently active (has active-text class)
     const activeNav = document.querySelector('.nav-item.active-text');
     if (!activeNav) {
         slider.classList.remove('visible');
         return;
     }
     
-    // Get the current page
     const currentPage = activeNav.dataset.page;
-    
-    // Only animate for Games, Library, Lyrics (they're on the same page)
-    // For Home and Settings, just show the dot instantly with no animation
     const animatePages = ['games', 'library', 'lyrics'];
     const shouldAnimate = animatePages.includes(currentPage);
     
-    // Get position of the active nav item
     const navRect = activeNav.getBoundingClientRect();
     const navParentRect = activeNav.closest('nav').getBoundingClientRect();
     
-    // Calculate position relative to nav
-    const left = navRect.left - navParentRect.left + (navRect.width / 2) - 3; // Center the dot (6px wide, so offset by 3px)
+    const left = navRect.left - navParentRect.left + (navRect.width / 2) - 3;
     
-    // Apply to slider
     slider.style.left = left + 'px';
     slider.classList.add('visible');
     
-    // If it's an animate page, ensure transition is enabled
-    // If it's Home or Settings, disable transition for instant jump
     if (!shouldAnimate) {
         slider.style.transition = 'none';
-        // Force reflow, then re-enable transition
         void slider.offsetHeight;
         slider.style.transition = 'left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
@@ -307,7 +267,6 @@ function updateDotPosition() {
 // ============================================
 
 function setupSettingsPage() {
-    // Populate fields with saved settings
     const nameInput = document.getElementById('user-name');
     const themeToggle = document.getElementById('theme-toggle');
     const serviceBtns = document.querySelectorAll('.service-btn');
@@ -316,12 +275,10 @@ function setupSettingsPage() {
     const saveBtn = document.getElementById('save-settings');
     const resetBtn = document.getElementById('reset-settings');
     
-    // Set name
     if (nameInput && state.settings.name) {
         nameInput.value = state.settings.name;
     }
     
-    // Set theme toggle
     if (themeToggle) {
         if (state.settings.theme === 'dark') {
             themeToggle.classList.add('active');
@@ -330,7 +287,6 @@ function setupSettingsPage() {
         }
     }
     
-    // Set service
     serviceBtns.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.service === state.settings.musicService) {
@@ -338,7 +294,6 @@ function setupSettingsPage() {
         }
     });
     
-    // Set rewind
     rewindBtns.forEach(btn => {
         btn.classList.remove('active');
         if (parseInt(btn.dataset.seconds) === state.settings.rewindSeconds) {
@@ -346,7 +301,6 @@ function setupSettingsPage() {
         }
     });
     
-    // Set forward
     forwardBtns.forEach(btn => {
         btn.classList.remove('active');
         if (parseInt(btn.dataset.seconds) === state.settings.forwardSeconds) {
@@ -354,16 +308,12 @@ function setupSettingsPage() {
         }
     });
     
-    // Show help boxes only on first visit
     if (state.isFirstVisit) {
         document.querySelectorAll('.help-box').forEach(box => {
             box.classList.add('visible');
         });
     }
     
-    // Event Listeners
-    
-    // Theme toggle
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
             this.classList.toggle('active');
@@ -374,7 +324,6 @@ function setupSettingsPage() {
         });
     }
     
-    // Service buttons
     serviceBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             serviceBtns.forEach(b => b.classList.remove('active'));
@@ -384,7 +333,6 @@ function setupSettingsPage() {
         });
     });
     
-    // Rewind buttons
     rewindBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             rewindBtns.forEach(b => b.classList.remove('active'));
@@ -394,7 +342,6 @@ function setupSettingsPage() {
         });
     });
     
-    // Forward buttons
     forwardBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             forwardBtns.forEach(b => b.classList.remove('active'));
@@ -404,10 +351,8 @@ function setupSettingsPage() {
         });
     });
     
-    // Save button - THIS redirects to home
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
-            // Get name
             const nameVal = nameInput ? nameInput.value.trim() : '';
             if (!nameVal) {
                 alert('Please enter your name.');
@@ -417,23 +362,18 @@ function setupSettingsPage() {
             state.settings.name = nameVal;
             saveSettings();
             
-            // Mark as visited
             localStorage.setItem('diljit_visited', 'true');
             state.isFirstVisit = false;
             
-            // Redirect to home
             window.location.href = 'index.html';
         });
     }
     
-    // Reset button
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                // Clear all localStorage
                 localStorage.clear();
                 
-                // Reset state
                 state.settings = {
                     name: '',
                     theme: 'light',
@@ -446,7 +386,6 @@ function setupSettingsPage() {
                 state.lyrics.sync = false;
                 state.isFirstVisit = true;
                 
-                // Reload page to show first visit state
                 window.location.reload();
             }
         });
@@ -458,7 +397,6 @@ function setupSettingsPage() {
 // ============================================
 
 function setupHomePage() {
-    // Display user name - no blue color
     const nameDisplay = document.getElementById('user-name-display');
     if (nameDisplay && state.settings.name) {
         nameDisplay.textContent = state.settings.name;
@@ -470,50 +408,11 @@ function setupHomePage() {
 // ============================================
 
 function setupMainPage() {
-    // Setup library (loads songs automatically)
     setupLibrary();
-    
-    // Setup lyrics
     setupLyrics();
-    
-    // Setup games (placeholder)
     setupGames();
-    
-    // Setup player controls
     setupPlayerControls();
-    
-    // Load last played song
     loadLastPlayedSong();
-}
-
-function loadLastPlayedSong() {
-    const lastSong = localStorage.getItem('diljit_last_song');
-    if (lastSong) {
-        try {
-            const parsed = JSON.parse(lastSong);
-            // Find and play the song
-            if (state.songsData) {
-                for (const album of state.songsData.albums) {
-                    for (const song of album.songs) {
-                        if (song.id === parsed.id) {
-                            // Update display without playing
-                            const currentSongName = document.getElementById('current-song-name');
-                            if (currentSongName) {
-                                currentSongName.textContent = song.title;
-                            }
-                            state.player.currentSong = song;
-                            state.player.currentAlbum = album;
-                            updateLyrics(song);
-                            break;
-                        }
-                    }
-                    if (state.player.currentSong) break;
-                }
-            }
-        } catch (e) {
-            console.error('Error loading last song:', e);
-        }
-    }
 }
 
 // ============================================
@@ -521,13 +420,11 @@ function loadLastPlayedSong() {
 // ============================================
 
 function setupLibrary() {
-    // Load search preference
     const savedSearchPref = localStorage.getItem('diljit_search_pref');
     if (savedSearchPref) {
         state.searchPreference = savedSearchPref;
     }
     
-    // Setup playlist link based on music service
     const playlistLink = document.getElementById('playlist-link');
     if (playlistLink) {
         if (state.settings.musicService === 'spotify') {
@@ -539,18 +436,15 @@ function setupLibrary() {
         }
     }
     
-    // Setup dropdown
     const dropdownToggle = document.querySelector('.dropdown-toggle');
     const dropdownMenu = document.querySelector('.dropdown-menu');
     const searchTypeLabel = document.getElementById('search-type-label');
     
-    // Force load the preference from localStorage again to be safe
     const savedPref = localStorage.getItem('diljit_search_pref');
     if (savedPref) {
         state.searchPreference = savedPref;
     }
     
-    // Set the label to saved preference on load
     if (searchTypeLabel) {
         if (state.searchPreference === 'album') {
             searchTypeLabel.textContent = 'Search by album';
@@ -581,7 +475,6 @@ function setupLibrary() {
                 
                 dropdownMenu.classList.remove('show');
                 
-                // Trigger search
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
                     performSearch(searchInput.value);
@@ -590,7 +483,6 @@ function setupLibrary() {
         });
     }
     
-    // Setup search input
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
@@ -598,7 +490,6 @@ function setupLibrary() {
         });
     }
     
-    // Load and display songs
     loadSongs().then(data => {
         if (data) {
             displayLibrary(data);
@@ -616,14 +507,12 @@ function displayLibrary(data) {
     
     albumList.innerHTML = '';
     
-    // Sort albums alphabetically by name
     const sortedAlbums = [...data.albums].sort((a, b) => a.name.localeCompare(b.name));
     
     sortedAlbums.forEach(album => {
         const albumContainer = document.createElement('div');
         albumContainer.className = 'album-container';
         
-        // Album header
         const header = document.createElement('div');
         header.className = 'album-header';
         
@@ -632,7 +521,7 @@ function displayLibrary(data) {
         albumArt.src = `images/album-covers/${album.cover}`;
         albumArt.alt = album.name;
         albumArt.onerror = function() {
-            this.src = ''; // Fallback if image not found
+            this.src = '';
             this.style.display = 'none';
         };
         
@@ -647,7 +536,6 @@ function displayLibrary(data) {
         header.appendChild(albumInfo);
         albumContainer.appendChild(header);
         
-        // Song table
         const table = document.createElement('table');
         table.className = 'song-table';
         
@@ -680,7 +568,6 @@ function displayLibrary(data) {
         albumList.appendChild(albumContainer);
     });
     
-    // Add click listeners to song names
     document.querySelectorAll('.song-name').forEach(element => {
         element.addEventListener('click', function() {
             const songId = parseInt(this.dataset.songId);
@@ -715,6 +602,21 @@ function playSongById(songId) {
         return;
     }
     
+    // Create or update audio element
+    if (!state.player.audio) {
+        state.player.audio = new Audio();
+    }
+    
+    // Stop current audio if playing
+    if (state.player.isPlaying) {
+        state.player.audio.pause();
+    }
+    
+    // Load new song
+    state.player.audio.src = `audio/${foundSong.audio}`;
+    state.player.audio.load();
+    state.player.audio.currentTime = 0;
+    
     // Update state
     state.player.currentSong = foundSong;
     state.player.currentAlbum = foundAlbum;
@@ -731,8 +633,16 @@ function playSongById(songId) {
         playIcon.src = 'images/icons/pause.png';
     }
     
+    // Play the audio
+    state.player.audio.play().catch(error => {
+        console.error('Error playing audio:', error);
+    });
+    
     // Update lyrics page
     updateLyrics(foundSong);
+    
+    // Build queue
+    buildQueue();
     
     // Save last played song
     localStorage.setItem('diljit_last_song', JSON.stringify({
@@ -741,7 +651,97 @@ function playSongById(songId) {
         album: foundAlbum.name
     }));
     
+    // Set up audio ended event
+    state.player.audio.onended = function() {
+        handleSongEnded();
+    };
+    
     console.log('Now playing:', foundSong.title);
+}
+
+// ============================================
+// BUILD QUEUE
+// ============================================
+
+function buildQueue() {
+    if (!state.songsData) return;
+    
+    // Get all songs in order
+    let allSongs = [];
+    state.songsData.albums.forEach(album => {
+        album.songs.forEach(song => {
+            allSongs.push({
+                ...song,
+                albumName: album.name
+            });
+        });
+    });
+    
+    // If shuffle is on, shuffle the queue
+    if (state.player.shuffle) {
+        // Shuffle algorithm - Fisher-Yates
+        for (let i = allSongs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
+        }
+    }
+    
+    state.player.queue = allSongs;
+    
+    // Find the index of the current song in the queue
+    if (state.player.currentSong) {
+        state.player.currentIndex = state.player.queue.findIndex(
+            song => song.id === state.player.currentSong.id
+        );
+        if (state.player.currentIndex === -1) {
+            state.player.currentIndex = 0;
+            state.player.currentSong = state.player.queue[0];
+        }
+    } else {
+        state.player.currentIndex = 0;
+        state.player.currentSong = state.player.queue[0];
+    }
+}
+
+// ============================================
+// HANDLE SONG ENDED
+// ============================================
+
+function handleSongEnded() {
+    if (state.player.loop === 'single') {
+        // Single song loop - replay current song
+        if (state.player.audio) {
+            state.player.audio.currentTime = 0;
+            state.player.audio.play();
+        }
+        return;
+    }
+    
+    // Move to next song
+    state.player.currentIndex++;
+    
+    // Check if we've reached the end
+    if (state.player.currentIndex >= state.player.queue.length) {
+        if (state.player.loop === 'on') {
+            // Loop the entire playlist
+            state.player.currentIndex = 0;
+        } else {
+            // Stop playback
+            state.player.currentIndex = state.player.queue.length - 1;
+            state.player.isPlaying = false;
+            const playIcon = document.getElementById('play-icon');
+            if (playIcon) {
+                playIcon.src = 'images/icons/play.png';
+            }
+            return;
+        }
+    }
+    
+    // Play the next song
+    const nextSong = state.player.queue[state.player.currentIndex];
+    if (nextSong) {
+        playSongById(nextSong.id);
+    }
 }
 
 // ============================================
@@ -758,11 +758,9 @@ function updateLyrics(song) {
     
     if (lyricsText) {
         if (song.lyrics && song.lyrics !== 'Lyrics coming soon...') {
-            // Format lyrics with timestamps
             const lines = song.lyrics.split('\n');
             let html = '';
             lines.forEach(line => {
-                // Check if line has timestamp [0.0]
                 const timestampMatch = line.match(/^\[([\d.]+)\]\s*(.*)/);
                 if (timestampMatch) {
                     const time = parseFloat(timestampMatch[1]);
@@ -779,10 +777,40 @@ function updateLyrics(song) {
     }
 }
 
+// ============================================
+// LOAD LAST PLAYED SONG
+// ============================================
+
+function loadLastPlayedSong() {
+    const lastSong = localStorage.getItem('diljit_last_song');
+    if (lastSong) {
+        try {
+            const parsed = JSON.parse(lastSong);
+            if (state.songsData) {
+                for (const album of state.songsData.albums) {
+                    for (const song of album.songs) {
+                        if (song.id === parsed.id) {
+                            const currentSongName = document.getElementById('current-song-name');
+                            if (currentSongName) {
+                                currentSongName.textContent = song.title;
+                            }
+                            state.player.currentSong = song;
+                            state.player.currentAlbum = album;
+                            updateLyrics(song);
+                            break;
+                        }
+                    }
+                    if (state.player.currentSong) break;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading last song:', e);
+        }
+    }
+}
+
 function performSearch(query) {
-    // This will be implemented when songs.json is loaded
     console.log('Searching for:', query);
-    // TODO: Load songs.json and filter
 }
 
 // ============================================
@@ -794,7 +822,6 @@ function setupLyrics() {
     const lyricsContainer = document.getElementById('lyrics-container');
     
     if (syncToggle) {
-        // Restore sync state
         if (state.lyrics.sync) {
             syncToggle.classList.add('active');
             if (lyricsContainer) {
@@ -806,16 +833,13 @@ function setupLyrics() {
             this.classList.toggle('active');
             const isSyncOn = this.classList.contains('active');
             
-            // Update state
             state.lyrics.sync = isSyncOn;
             saveLyricsState();
             
             if (isSyncOn) {
                 lyricsContainer.classList.add('lyrics-sync-on');
-                // TODO: Enable sync scrolling
             } else {
                 lyricsContainer.classList.remove('lyrics-sync-on');
-                // TODO: Disable sync scrolling
             }
         });
     }
@@ -826,7 +850,6 @@ function setupLyrics() {
 // ============================================
 
 function setupGames() {
-    // Games will be implemented later
     console.log('Games section loaded');
 }
 
@@ -848,7 +871,9 @@ function setupPlayerControls() {
     const currentSongName = document.getElementById('current-song-name');
     
     // Default state - empty
-    currentSongName.textContent = '-';
+    if (currentSongName) {
+        currentSongName.textContent = '-';
+    }
     
     // Restore shuffle state
     if (shuffleIcon) {
@@ -885,11 +910,11 @@ function setupPlayerControls() {
             state.player.isPlaying = !state.player.isPlaying;
             
             if (state.player.isPlaying) {
+                state.player.audio.play();
                 playIcon.src = 'images/icons/pause.png';
-                // TODO: Start audio playback
             } else {
+                state.player.audio.pause();
                 playIcon.src = 'images/icons/play.png';
-                // TODO: Pause audio playback
             }
         });
     }
@@ -902,10 +927,22 @@ function setupPlayerControls() {
             
             if (state.player.shuffle) {
                 shuffleIcon.src = 'images/icons/shuffle-on.png';
-                // TODO: Shuffle queue
             } else {
                 shuffleIcon.src = 'images/icons/shuffle-off.png';
-                // TODO: Restore alphabetical queue
+            }
+            
+            // Rebuild queue with new shuffle setting
+            buildQueue();
+            
+            // Update current index
+            if (state.player.currentSong) {
+                state.player.currentIndex = state.player.queue.findIndex(
+                    song => song.id === state.player.currentSong.id
+                );
+                if (state.player.currentIndex === -1) {
+                    state.player.currentIndex = 0;
+                    state.player.currentSong = state.player.queue[0];
+                }
             }
         });
     }
@@ -936,42 +973,74 @@ function setupPlayerControls() {
     // Previous
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
-            // Check if single song loop is on - block navigation
             if (state.player.loop === 'single') {
                 alert('Single song loop is on. Turn off to play the previous song.');
                 return;
             }
-            // TODO: Previous song in queue
-            console.log('Previous song');
+            
+            if (!state.player.queue.length) {
+                buildQueue();
+            }
+            
+            state.player.currentIndex--;
+            if (state.player.currentIndex < 0) {
+                state.player.currentIndex = state.player.queue.length - 1;
+            }
+            
+            const prevSong = state.player.queue[state.player.currentIndex];
+            if (prevSong) {
+                playSongById(prevSong.id);
+            }
         });
     }
     
     // Next
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            // Check if single song loop is on - block navigation
             if (state.player.loop === 'single') {
                 alert('Single song loop is on. Turn off to play the next song.');
                 return;
             }
-            // TODO: Next song in queue
-            console.log('Next song');
+            
+            if (!state.player.queue.length) {
+                buildQueue();
+            }
+            
+            state.player.currentIndex++;
+            if (state.player.currentIndex >= state.player.queue.length) {
+                if (state.player.loop === 'on') {
+                    state.player.currentIndex = 0;
+                } else {
+                    state.player.currentIndex = state.player.queue.length - 1;
+                    return;
+                }
+            }
+            
+            const nextSong = state.player.queue[state.player.currentIndex];
+            if (nextSong) {
+                playSongById(nextSong.id);
+            }
         });
     }
     
     // Rewind
     if (rewindBtn) {
         rewindBtn.addEventListener('click', function() {
-            console.log(`Rewind ${state.settings.rewindSeconds} seconds`);
-            // TODO: Rewind audio by rewindSeconds
+            if (!state.player.audio) return;
+            const newTime = Math.max(0, state.player.audio.currentTime - state.settings.rewindSeconds);
+            state.player.audio.currentTime = newTime;
+            console.log(`Rewind ${state.settings.rewindSeconds} seconds to ${newTime}s`);
         });
     }
     
     // Forward
     if (forwardBtn) {
         forwardBtn.addEventListener('click', function() {
-            console.log(`Forward ${state.settings.forwardSeconds} seconds`);
-            // TODO: Forward audio by forwardSeconds
+            if (!state.player.audio) return;
+            const duration = state.player.audio.duration || 0;
+            const newTime = Math.min(duration, state.player.audio.currentTime + state.settings.forwardSeconds);
+            state.player.audio.currentTime = newTime;
+            console.log(`Forward ${state.settings.forwardSeconds} seconds to ${newTime}s`);
         });
     }
 }
@@ -981,14 +1050,11 @@ function setupPlayerControls() {
 // ============================================
 
 function setupScrollTracking() {
-    // Track scroll position on home page
     const homeContent = document.getElementById('home-content');
     if (homeContent) {
-        // Restore scroll position
         const savedPos = state.scrollPositions.home || 0;
         window.scrollTo(0, savedPos);
         
-        // Save on scroll
         window.addEventListener('scroll', function() {
             if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname === '/mobile/') {
                 state.scrollPositions.home = window.scrollY;
@@ -996,14 +1062,11 @@ function setupScrollTracking() {
         });
     }
     
-    // Track scroll on main page sections
     if (window.location.pathname.includes('main.html')) {
-        // Save scroll positions when switching sections
         const sections = ['games', 'library', 'lyrics'];
         sections.forEach(sectionId => {
             const section = document.getElementById(sectionId);
             if (section) {
-                // Restore scroll position when section becomes active
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
                         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -1011,7 +1074,6 @@ function setupScrollTracking() {
                                 const savedPos = state.scrollPositions[sectionId] || 0;
                                 window.scrollTo(0, savedPos);
                             } else {
-                                // Save position when leaving
                                 state.scrollPositions[sectionId] = window.scrollY;
                             }
                         }
@@ -1022,7 +1084,6 @@ function setupScrollTracking() {
             }
         });
         
-        // Also save on scroll
         window.addEventListener('scroll', function() {
             const activeSection = document.querySelector('.page-section.active');
             if (activeSection) {
@@ -1032,7 +1093,6 @@ function setupScrollTracking() {
         });
     }
     
-    // Track settings page scroll
     if (window.location.pathname.includes('settings.html')) {
         const savedPos = state.scrollPositions.settings || 0;
         window.scrollTo(0, savedPos);
@@ -1042,10 +1102,6 @@ function setupScrollTracking() {
         });
     }
 }
-
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
 
 // ============================================
 // LOAD SONGS FROM JSON
@@ -1071,7 +1127,7 @@ function loadSongs() {
 }
 
 // ============================================
-// EXPOSE STATE FOR DEBUGGING (Optional)
+// EXPOSE STATE FOR DEBUGGING
 // ============================================
 
 window.__state = state;
