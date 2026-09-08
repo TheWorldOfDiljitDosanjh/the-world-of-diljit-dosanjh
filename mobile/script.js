@@ -20,8 +20,8 @@ const state = {
         isPlaying: false,
         position: 0,
         queue: [],
-        shuffle: false,
-        loop: 'off' // 'off', 'on', 'single'
+        shuffle: true,
+        loop: 'on' // 'off', 'on', 'single'
     },
     lyrics: {
         sync: false
