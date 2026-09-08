@@ -446,6 +446,11 @@ function setupLibrary() {
         state.searchPreference = savedSearchPref;
     }
     
+    const savedSortPref = localStorage.getItem('diljit_sort_pref');
+    if (savedSortPref) {
+        state.sortPreference = savedSortPref;
+    }
+    
     const playlistLink = document.getElementById('playlist-link');
     if (playlistLink) {
         if (state.settings.musicService === 'spotify') {
@@ -457,44 +462,30 @@ function setupLibrary() {
         }
     }
     
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
+    // Search dropdown
+    const searchToggle = document.getElementById('search-toggle');
+    const searchMenu = document.getElementById('search-menu');
     const searchTypeLabel = document.getElementById('search-type-label');
     
-    const savedPref = localStorage.getItem('diljit_search_pref');
-    if (savedPref) {
-        state.searchPreference = savedPref;
-    }
+    // Sort dropdown
+    const sortToggle = document.getElementById('sort-toggle');
+    const sortMenu = document.getElementById('sort-menu');
+    const sortTypeLabel = document.getElementById('sort-type-label');
     
-    if (searchTypeLabel) {
-        if (state.searchPreference === 'album') {
-            searchTypeLabel.textContent = 'Search by album';
-        } else {
-            searchTypeLabel.textContent = 'Search by song';
-        }
-    }
-        
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function(e) {
+    // Search dropdown
+    if (searchToggle && searchMenu) {
+        searchToggle.addEventListener('click', function(e) {
             e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
+            searchMenu.classList.toggle('show');
+            if (sortMenu) sortMenu.classList.remove('show');
         });
         
-        document.addEventListener('click', function() {
-            dropdownMenu.classList.remove('show');
-        });
-        
-        dropdownMenu.querySelectorAll('li').forEach(item => {
+        searchMenu.querySelectorAll('li').forEach(item => {
             item.addEventListener('click', function() {
                 const type = this.dataset.searchType;
                 state.searchPreference = type;
                 localStorage.setItem('diljit_search_pref', type);
-                
-                if (searchTypeLabel) {
-                    searchTypeLabel.textContent = type === 'song' ? 'Search by song' : 'Search by album';
-                }
-                
-                dropdownMenu.classList.remove('show');
+                searchMenu.classList.remove('show');
                 
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
@@ -503,6 +494,35 @@ function setupLibrary() {
             });
         });
     }
+    
+    // Sort dropdown
+    if (sortToggle && sortMenu) {
+        sortToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sortMenu.classList.toggle('show');
+            if (searchMenu) searchMenu.classList.remove('show');
+        });
+        
+        sortMenu.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', function() {
+                const type = this.dataset.sortType;
+                state.sortPreference = type;
+                localStorage.setItem('diljit_sort_pref', type);
+                sortMenu.classList.remove('show');
+                
+                // Refresh the library with new sort
+                if (state.songsData) {
+                    displayLibrary(state.songsData);
+                }
+            });
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        if (searchMenu) searchMenu.classList.remove('show');
+        if (sortMenu) sortMenu.classList.remove('show');
+    });
     
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
