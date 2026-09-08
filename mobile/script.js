@@ -511,6 +511,15 @@ function setupLibrary() {
     const dropdownMenu = document.querySelector('.dropdown-menu');
     const searchTypeLabel = document.getElementById('search-type-label');
     
+    // Set the label to saved preference on load
+    if (searchTypeLabel) {
+        if (state.searchPreference === 'album') {
+            searchTypeLabel.textContent = 'Search by album';
+        } else {
+            searchTypeLabel.textContent = 'Search by song';
+        }
+    }
+    
     if (dropdownToggle && dropdownMenu) {
         dropdownToggle.addEventListener('click', function(e) {
             e.stopPropagation();
