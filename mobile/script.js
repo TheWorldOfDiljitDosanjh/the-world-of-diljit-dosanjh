@@ -637,7 +637,11 @@ function playSongById(songId) {
     });
     
     updateLyrics(foundSong);
-    buildQueue();
+    
+    // Only build queue if it's empty (first song) or if currentSong is null
+    if (state.player.queue.length === 0 || !state.player.currentSong) {
+        buildQueue();
+    }
     
     localStorage.setItem('diljit_last_song', JSON.stringify({
         id: foundSong.id,
@@ -695,6 +699,7 @@ function buildQueue() {
         state.player.currentIndex = state.player.queue.findIndex(
             song => song.id === state.player.currentSong.id
         );
+        // If current song not found in queue (shouldn't happen), reset
         if (state.player.currentIndex === -1) {
             state.player.currentIndex = 0;
             state.player.currentSong = state.player.queue[0];
