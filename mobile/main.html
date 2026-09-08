@@ -93,16 +93,24 @@
 
     <!-- Player Controls - Only on main.html -->
     <div id="player-controls">
+        <!-- Progress Bar -->
+        <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress-filled"></div>
+                <div id="progress-dot"></div>
+            </div>
+        </div>
+        <!-- Top Row: Time | Song Name | Duration -->
         <div class="player-row-top">
+            <span id="current-time">0:00</span>
+            <span id="current-song-name">-</span>
+            <span id="song-duration">0:00</span>
+        </div>
+        <!-- Bottom Row: Shuffle | Prev | Rew | Play | Fwd | Next | Loop -->
+        <div class="player-row-bottom">
             <button id="shuffle-btn" class="player-btn">
                 <img src="images/icons/shuffle-off.png" alt="Shuffle" id="shuffle-icon">
             </button>
-            <span id="current-song-name">-</span>
-            <button id="loop-btn" class="player-btn">
-                <img src="images/icons/loop-off.png" alt="Loop" id="loop-icon">
-            </button>
-        </div>
-        <div class="player-row-bottom">
             <button id="prev-btn" class="player-btn">
                 <img src="images/icons/previous.png" alt="Previous">
             </button>
@@ -117,6 +125,9 @@
             </button>
             <button id="next-btn" class="player-btn">
                 <img src="images/icons/next.png" alt="Next">
+            </button>
+            <button id="loop-btn" class="player-btn">
+                <img src="images/icons/loop-off.png" alt="Loop" id="loop-icon">
             </button>
         </div>
     </div>
