@@ -413,6 +413,30 @@ function setupMainPage() {
     setupGames();
     setupPlayerControls();
     loadLastPlayedSong();
+    
+    // Build queue if songs are loaded and no queue exists
+    if (state.songsData && state.player.queue.length === 0) {
+        // If there's a last played song, use it
+        const lastSong = localStorage.getItem('diljit_last_song');
+        if (lastSong) {
+            try {
+                const parsed = JSON.parse(lastSong);
+                // Find the song
+                for (const album of state.songsData.albums) {
+                    for (const song of album.songs) {
+                        if (song.id === parsed.id) {
+                            buildQueueWithStartingSong(song);
+                            return;
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        // Fallback - build queue with first song of first album
+        if (state.songsData.albums.length > 0 && state.songsData.albums[0].songs.length > 0) {
+            buildQueueWithStartingSong(state.songsData.albums[0].songs[0]);
+        }
+    }
 }
 
 // ============================================
@@ -638,10 +662,9 @@ function playSongById(songId) {
     
     updateLyrics(foundSong);
     
-    // Only build queue if it's empty (first song) or if currentSong is null
-    if (state.player.queue.length === 0 || !state.player.currentSong) {
-        buildQueue();
-    }
+    // Always rebuild queue when a song is manually selected
+    // This puts the selected song at the start of the queue
+    buildQueueWithStartingSong(foundSong);
     
     localStorage.setItem('diljit_last_song', JSON.stringify({
         id: foundSong.id,
@@ -708,6 +731,63 @@ function buildQueue() {
         state.player.currentIndex = 0;
         state.player.currentSong = state.player.queue[0];
     }
+}
+
+// ============================================
+// BUILD QUEUE WITH STARTING SONG
+// ============================================
+
+function buildQueueWithStartingSong(startingSong) {
+    if (!state.songsData) return;
+    
+    // Get all songs in alphabetical order (by album name, then track number)
+    let allSongs = [];
+    state.songsData.albums.forEach(album => {
+        album.songs.forEach(song => {
+            allSongs.push({
+                ...song,
+                albumName: album.name
+            });
+        });
+    });
+    
+    // Sort by album name (ignoring punctuation), then track number
+    allSongs.sort((a, b) => {
+        const cleanA = a.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const cleanB = b.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (cleanA !== cleanB) {
+            return cleanA.localeCompare(cleanB);
+        }
+        return a.track - b.track;
+    });
+    
+    // If shuffle is on, shuffle the queue with starting song first
+    if (state.player.shuffle) {
+        // Find the starting song and remove it from the list
+        const startIndex = allSongs.findIndex(song => song.id === startingSong.id);
+        if (startIndex !== -1) {
+            const [startSong] = allSongs.splice(startIndex, 1);
+            
+            // Shuffle the remaining songs
+            for (let i = allSongs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
+            }
+            
+            // Put the starting song at the beginning
+            allSongs = [startSong, ...allSongs];
+        } else {
+            // Fallback - just shuffle normally
+            for (let i = allSongs.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
+            }
+        }
+    }
+    
+    state.player.queue = allSongs;
+    state.player.currentIndex = 0;
+    state.player.currentSong = startingSong;
 }
 
 // ============================================
@@ -929,16 +1009,12 @@ function setupPlayerControls() {
                 shuffleIcon.src = 'images/icons/shuffle-off.png';
             }
             
-            buildQueue();
-            
+            // Rebuild queue with current song as starting point (if shuffle ON)
+            // or rebuild in album order (if shuffle OFF)
             if (state.player.currentSong) {
-                state.player.currentIndex = state.player.queue.findIndex(
-                    song => song.id === state.player.currentSong.id
-                );
-                if (state.player.currentIndex === -1) {
-                    state.player.currentIndex = 0;
-                    state.player.currentSong = state.player.queue[0];
-                }
+                buildQueueWithStartingSong(state.player.currentSong);
+            } else {
+                buildQueue();
             }
         });
     }
