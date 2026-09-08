@@ -1,1 +1,676 @@
-
+{
+  "albums": [
+    {
+      "name": "Advisory",
+      "releaseDate": "6 February 2025",
+      "cover": "advisory.jpg",
+      "songs": [
+        {
+          "id": 1,
+          "title": "Baby Girl",
+          "track": 1,
+          "duration": 157,
+          "audio": "baby-girl.mp3",
+          "lyrics": "[0.0] Show Mxrci on it\n[3.2] Oh khabar'aa ch yaar huni chhaye hoye aa\n[6.5] Dhauno fadd vairi main manaye hoye aa\n[9.8] Horr jatt baare kude ki puchhdi\n[13.1] Gungeyan ton geet main gavaaye hoye aa\n[16.4] Sutta sher phire jaan jaan chhed'di\n[19.7] Kaaston kude\n[23.0] Chandigarh thi jatta di car phire gherdi\n[26.3] Kaaston kude\n[29.6] Chandigarh thi jatta di car phire gherdi\n[32.9] Kaaston kude\n[36.2] Oh gabru de pichhe ae tu bade der di\n[39.5] Kaaston kude\n[42.8] Chandigarh thi jatta di car phire gherdi\n[46.1] Kaaston kude\n[49.4] Ho taave taave taave\n[52.7] Taave taave taave\n[56.0] Taave taave taave\n[59.3] Ni gehdi route jaam ho gaya\n[62.6] Ni gehdi route jaam ho gay\n[65.9] Ni teri Thar shookdi jaave\n[69.2] Ni gehdi route jaam ho gaya\n[72.5] Thar shookdi jaave\n[75.8] Oh chakme status jeh pauni ae billo\n[79.1] Kihnu maan-maan aakh ke bulauni ae billo\n[82.4] Oh mum dad kolo billo ola rakh ke\n[85.7] Oh sidhi Ciroc muh nu launi ae billo\n[89.0] Oh tere baare gabru nu pata lageya ae\n[92.3] Ni bande khaas ton kude\n[95.6] Chandigarh thi jatta di car phire gherdi\n[98.9] Kaaston kude\n[102.2] Chandigarh thi jatta di car phire gherdi\n[105.5] Kaaston kude\n[108.8] Oh gabru de pichhe ae tu bade der di\n[112.1] Kaaston kude\n[115.4] Chandigarh thi jatta di car phire gherdi\n[118.7] Kaaston kude\n[122.0] Weekend te magauni ae tu Uber billo\n[125.3] Garmi ch hove Vancouver billo\n[128.6] Jattiye ni tere off-white jachdae\n[131.9] Mitran te jachda ae Lugar billo\n[135.2] Oh mitran ne taza taza maut dekhi ae ni\n[138.5] Bade paas ton kude\n[141.8] Chandigarh thi jatta di car phire gherdi\n[145.1] Kaaston kude\n[148.4] Chandigarh thi jatta di car phire gherdi\n[151.7] Kaaston kude\n[155.0] Oh gabru de pichhe ae tu bade der di\n[158.3] Kaaston kude\n[161.6] Chandigarh thi jatta di car phire gherdi\n[164.9] Kaaston kude\n[168.2] (Chandigarh thi jatta di car phire gherdi)\n[171.5] (Kaaston kude)"
+        },
+        {
+          "id": 2,
+          "title": "Heer",
+          "track": 2,
+          "duration": 164,
+          "audio": "heer.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 3,
+          "title": "Holster",
+          "track": 3,
+          "duration": 127,
+          "audio": "holster.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 4,
+          "title": "IDGAF",
+          "track": 4,
+          "duration": 213,
+          "audio": "idgaf.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 5,
+          "title": "Pistol",
+          "track": 5,
+          "duration": 150,
+          "audio": "pistol.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 6,
+          "title": "Tension",
+          "track": 6,
+          "duration": 168,
+          "audio": "tension.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "Aura",
+      "releaseDate": "15 October 2025",
+      "cover": "aura.jpg",
+      "songs": [
+        {
+          "id": 7,
+          "title": "Balle Balle",
+          "track": 1,
+          "duration": 136,
+          "audio": "balle-balle.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 8,
+          "title": "Ban",
+          "track": 2,
+          "duration": 172,
+          "audio": "ban.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 9,
+          "title": "Broken Soul",
+          "track": 3,
+          "duration": 177,
+          "audio": "broken-soul.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 10,
+          "title": "Charmer",
+          "track": 4,
+          "duration": 175,
+          "audio": "charmer.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 11,
+          "title": "God Bless",
+          "track": 5,
+          "duration": 185,
+          "audio": "god-bless.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 12,
+          "title": "Gunda",
+          "track": 6,
+          "duration": 193,
+          "audio": "gunda.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 13,
+          "title": "Kufar",
+          "track": 7,
+          "duration": 158,
+          "audio": "kufar.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 14,
+          "title": "Mahiya",
+          "track": 8,
+          "duration": 212,
+          "audio": "mahiya.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 15,
+          "title": "Senorita",
+          "track": 9,
+          "duration": 178,
+          "audio": "senorita.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 16,
+          "title": "You & Me",
+          "track": 10,
+          "duration": 179,
+          "audio": "you-and-me.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "Con.Fi.Den.Tial",
+      "releaseDate": "28 February 2018",
+      "cover": "confidential.jpg",
+      "songs": [
+        {
+          "id": 17,
+          "title": "Beedio Call",
+          "track": 1,
+          "duration": 213,
+          "audio": "beedio-call.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 18,
+          "title": "Big Scene",
+          "track": 2,
+          "duration": 207,
+          "audio": "big-scene.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 19,
+          "title": "Drive",
+          "track": 3,
+          "duration": 230,
+          "audio": "drive.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 20,
+          "title": "Future",
+          "track": 4,
+          "duration": 173,
+          "audio": "future.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 21,
+          "title": "High End",
+          "track": 5,
+          "duration": 176,
+          "audio": "high-end.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 22,
+          "title": "Offline",
+          "track": 6,
+          "duration": 197,
+          "audio": "offline.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 23,
+          "title": "Pain",
+          "track": 7,
+          "duration": 173,
+          "audio": "pain.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 24,
+          "title": "Sorry",
+          "track": 8,
+          "duration": 161,
+          "audio": "sorry.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 25,
+          "title": "Weekend",
+          "track": 9,
+          "duration": 161,
+          "audio": "weekend.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "Drive Thru",
+      "releaseDate": "15 July 2022",
+      "cover": "drivethru.jpg",
+      "songs": [
+        {
+          "id": 26,
+          "title": "Caviar",
+          "track": 1,
+          "duration": 142,
+          "audio": "caviar.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 27,
+          "title": "Lemonade",
+          "track": 2,
+          "duration": 166,
+          "audio": "lemonade.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 28,
+          "title": "Peaches",
+          "track": 3,
+          "duration": 189,
+          "audio": "peaches.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 29,
+          "title": "Red Chilli",
+          "track": 4,
+          "duration": 152,
+          "audio": "red-chilli.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 30,
+          "title": "Vanilla",
+          "track": 5,
+          "duration": 171,
+          "audio": "vanilla.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "Ghost",
+      "releaseDate": "29 September 2023",
+      "cover": "ghost.jpg",
+      "songs": [
+        {
+          "id": 31,
+          "title": "Amiri",
+          "track": 1,
+          "duration": 117,
+          "audio": "amiri.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 32,
+          "title": "Bad Habits",
+          "track": 2,
+          "duration": 167,
+          "audio": "bad-habits.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 33,
+          "title": "Case",
+          "track": 3,
+          "duration": 135,
+          "audio": "case.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 34,
+          "title": "Cry Later",
+          "track": 4,
+          "duration": 148,
+          "audio": "cry-later.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 35,
+          "title": "Daytona",
+          "track": 5,
+          "duration": 180,
+          "audio": "daytona.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 36,
+          "title": "Drowning",
+          "track": 6,
+          "duration": 159,
+          "audio": "drowning.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 37,
+          "title": "Feel My Love",
+          "track": 7,
+          "duration": 212,
+          "audio": "feel-my-love.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 38,
+          "title": "Ghost",
+          "track": 8,
+          "duration": 165,
+          "audio": "ghost.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 39,
+          "title": "Icon",
+          "track": 9,
+          "duration": 148,
+          "audio": "icon.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 40,
+          "title": "Jatt Vailly",
+          "track": 10,
+          "duration": 152,
+          "audio": "jatt-vailly.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 41,
+          "title": "Kehkashan",
+          "track": 11,
+          "duration": 180,
+          "audio": "kehkashan.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 42,
+          "title": "Kinni Kinni",
+          "track": 12,
+          "duration": 213,
+          "audio": "kinni-kinni.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 43,
+          "title": "Lalkara",
+          "track": 13,
+          "duration": 160,
+          "audio": "lalkara.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 44,
+          "title": "Midnight Desires",
+          "track": 14,
+          "duration": 172,
+          "audio": "midnight-desires.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 45,
+          "title": "Poppin'",
+          "track": 15,
+          "duration": 154,
+          "audio": "poppin.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 46,
+          "title": "Psychotic",
+          "track": 16,
+          "duration": 275,
+          "audio": "psychotic.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 47,
+          "title": "Serenade",
+          "track": 17,
+          "duration": 97,
+          "audio": "serenade.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 48,
+          "title": "Stars",
+          "track": 18,
+          "duration": 185,
+          "audio": "stars.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 49,
+          "title": "Whatcha Doin'",
+          "track": 19,
+          "duration": 137,
+          "audio": "whatcha-doin.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "G.O.A.T.",
+      "releaseDate": "29 July 2020",
+      "cover": "goat.jpg",
+      "songs": [
+        {
+          "id": 50,
+          "title": "Akh Laal Jatt Di",
+          "track": 1,
+          "duration": 240,
+          "audio": "akh-laal-jatt-di.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 51,
+          "title": "Born to Shine",
+          "track": 2,
+          "duration": 213,
+          "audio": "born-to-shine.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 52,
+          "title": "Clash",
+          "track": 3,
+          "duration": 176,
+          "audio": "clash.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 53,
+          "title": "Faraar",
+          "track": 4,
+          "duration": 193,
+          "audio": "faraar.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 54,
+          "title": "G.O.A.T.",
+          "track": 5,
+          "duration": 223,
+          "audio": "goat.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 55,
+          "title": "Habit",
+          "track": 6,
+          "duration": 183,
+          "audio": "habit.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 56,
+          "title": "Jatti",
+          "track": 7,
+          "duration": 179,
+          "audio": "jatti.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 57,
+          "title": "Navi Navi Yaari",
+          "track": 8,
+          "duration": 215,
+          "audio": "navi-navi-yaari.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 58,
+          "title": "Patola",
+          "track": 9,
+          "duration": 214,
+          "audio": "patola.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 59,
+          "title": "Peed",
+          "track": 10,
+          "duration": 264,
+          "audio": "peed.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 60,
+          "title": "Pyaar",
+          "track": 11,
+          "duration": 236,
+          "audio": "pyaar.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 61,
+          "title": "Range",
+          "track": 12,
+          "duration": 172,
+          "audio": "range.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 62,
+          "title": "Taare",
+          "track": 13,
+          "duration": 203,
+          "audio": "taare.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 63,
+          "title": "Track Suit",
+          "track": 14,
+          "duration": 198,
+          "audio": "track-suit.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 64,
+          "title": "Whiskey",
+          "track": 15,
+          "duration": 205,
+          "audio": "whiskey.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "MoonChild Era",
+      "releaseDate": "22 August 2021",
+      "cover": "moonchild.jpg",
+      "songs": [
+        {
+          "id": 65,
+          "title": "Black & White",
+          "track": 1,
+          "duration": 166,
+          "audio": "black-and-white.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 66,
+          "title": "Cali",
+          "track": 2,
+          "duration": 158,
+          "audio": "cali.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 67,
+          "title": "Champagne",
+          "track": 3,
+          "duration": 182,
+          "audio": "champagne.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 68,
+          "title": "Da Crew",
+          "track": 4,
+          "duration": 181,
+          "audio": "da-crew.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 69,
+          "title": "Hoops",
+          "track": 5,
+          "duration": 190,
+          "audio": "hoops.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 70,
+          "title": "Lover",
+          "track": 6,
+          "duration": 190,
+          "audio": "lover.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 71,
+          "title": "Luna",
+          "track": 7,
+          "duration": 186,
+          "audio": "luna.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 72,
+          "title": "Vibe",
+          "track": 8,
+          "duration": 155,
+          "audio": "vibe.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 73,
+          "title": "Void",
+          "track": 9,
+          "duration": 212,
+          "audio": "void.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    },
+    {
+      "name": "The Call of Panjab",
+      "releaseDate": "23 April 2026",
+      "cover": "callofpanjab.jpg",
+      "songs": [
+        {
+          "id": 74,
+          "title": "Aroma",
+          "track": 1,
+          "duration": 188,
+          "audio": "aroma.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 75,
+          "title": "Haan Da",
+          "track": 2,
+          "duration": 236,
+          "audio": "haan-da.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 76,
+          "title": "Jeona Morh",
+          "track": 3,
+          "duration": 201,
+          "audio": "jeona-morh.mp3",
+          "lyrics": "Lyrics coming soon..."
+        },
+        {
+          "id": 77,
+          "title": "Morni",
+          "track": 4,
+          "duration": 201,
+          "audio": "morni.mp3",
+          "lyrics": "Lyrics coming soon..."
+        }
+      ]
+    }
+  ]
+}
