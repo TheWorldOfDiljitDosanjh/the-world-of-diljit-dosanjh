@@ -723,6 +723,11 @@ function setupPlayerControls() {
     // Previous
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
+            // Check if single song loop is on - block navigation
+            if (state.player.loop === 'single') {
+                alert('Single song loop is on. Turn off to play the previous song.');
+                return;
+            }
             // TODO: Previous song in queue
             console.log('Previous song');
         });
@@ -731,16 +736,13 @@ function setupPlayerControls() {
     // Next
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            // Check if loop is on and show popup
-            if (state.player.loop === 'on') {
-                if (confirm('Loop is on. Turn off to play the next song?')) {
-                    // TODO: Next song in queue
-                    console.log('Next song');
-                }
-            } else {
-                // TODO: Next song in queue
-                console.log('Next song');
+            // Check if single song loop is on - block navigation
+            if (state.player.loop === 'single') {
+                alert('Single song loop is on. Turn off to play the next song.');
+                return;
             }
+            // TODO: Next song in queue
+            console.log('Next song');
         });
     }
     
