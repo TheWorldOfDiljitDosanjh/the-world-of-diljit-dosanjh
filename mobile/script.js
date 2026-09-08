@@ -507,7 +507,12 @@ function displayLibrary(data) {
     
     albumList.innerHTML = '';
     
-    const sortedAlbums = [...data.albums].sort((a, b) => a.name.localeCompare(b.name));
+    const sortedAlbums = [...data.albums].sort((a, b) => {
+        // Remove punctuation and spaces for comparison
+        const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        return cleanA.localeCompare(cleanB);
+    });
     
     sortedAlbums.forEach(album => {
         const albumContainer = document.createElement('div');
