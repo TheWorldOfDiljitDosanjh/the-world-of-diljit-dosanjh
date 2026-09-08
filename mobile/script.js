@@ -470,7 +470,7 @@ function setupHomePage() {
 // ============================================
 
 function setupMainPage() {
-    // Setup library
+    // Setup library (loads songs automatically)
     setupLibrary();
     
     // Setup lyrics
@@ -481,6 +481,39 @@ function setupMainPage() {
     
     // Setup player controls
     setupPlayerControls();
+    
+    // Load last played song
+    loadLastPlayedSong();
+}
+
+function loadLastPlayedSong() {
+    const lastSong = localStorage.getItem('diljit_last_song');
+    if (lastSong) {
+        try {
+            const parsed = JSON.parse(lastSong);
+            // Find and play the song
+            if (state.songsData) {
+                for (const album of state.songsData.albums) {
+                    for (const song of album.songs) {
+                        if (song.id === parsed.id) {
+                            // Update display without playing
+                            const currentSongName = document.getElementById('current-song-name');
+                            if (currentSongName) {
+                                currentSongName.textContent = song.title;
+                            }
+                            state.player.currentSong = song;
+                            state.player.currentAlbum = album;
+                            updateLyrics(song);
+                            break;
+                        }
+                    }
+                    if (state.player.currentSong) break;
+                }
+            }
+        } catch (e) {
+            console.error('Error loading last song:', e);
+        }
+    }
 }
 
 // ============================================
@@ -563,6 +596,186 @@ function setupLibrary() {
         searchInput.addEventListener('input', function() {
             performSearch(this.value);
         });
+    }
+    
+    // Load and display songs
+    loadSongs().then(data => {
+        if (data) {
+            displayLibrary(data);
+        }
+    });
+}
+
+// ============================================
+// DISPLAY LIBRARY
+// ============================================
+
+function displayLibrary(data) {
+    const albumList = document.getElementById('album-list');
+    if (!albumList) return;
+    
+    albumList.innerHTML = '';
+    
+    // Sort albums alphabetically by name
+    const sortedAlbums = [...data.albums].sort((a, b) => a.name.localeCompare(b.name));
+    
+    sortedAlbums.forEach(album => {
+        const albumContainer = document.createElement('div');
+        albumContainer.className = 'album-container';
+        
+        // Album header
+        const header = document.createElement('div');
+        header.className = 'album-header';
+        
+        const albumArt = document.createElement('img');
+        albumArt.className = 'album-art';
+        albumArt.src = `images/album-covers/${album.cover}`;
+        albumArt.alt = album.name;
+        albumArt.onerror = function() {
+            this.src = ''; // Fallback if image not found
+            this.style.display = 'none';
+        };
+        
+        const albumInfo = document.createElement('div');
+        albumInfo.className = 'album-info';
+        albumInfo.innerHTML = `
+            <div class="album-name">${album.name}</div>
+            <div class="album-meta">${album.songs.length} songs • ${album.releaseDate}</div>
+        `;
+        
+        header.appendChild(albumArt);
+        header.appendChild(albumInfo);
+        albumContainer.appendChild(header);
+        
+        // Song table
+        const table = document.createElement('table');
+        table.className = 'song-table';
+        
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+            <tr>
+                <th>#</th>
+                <th>Song</th>
+                <th>Duration</th>
+            </tr>
+        `;
+        table.appendChild(thead);
+        
+        const tbody = document.createElement('tbody');
+        album.songs.forEach(song => {
+            const tr = document.createElement('tr');
+            const durationMinutes = Math.floor(song.duration / 60);
+            const durationSeconds = song.duration % 60;
+            const durationFormatted = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+            
+            tr.innerHTML = `
+                <td>${song.track}</td>
+                <td class="song-name" data-song-id="${song.id}">${song.title}</td>
+                <td>${durationFormatted}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        albumContainer.appendChild(table);
+        albumList.appendChild(albumContainer);
+    });
+    
+    // Add click listeners to song names
+    document.querySelectorAll('.song-name').forEach(element => {
+        element.addEventListener('click', function() {
+            const songId = parseInt(this.dataset.songId);
+            playSongById(songId);
+        });
+    });
+}
+
+// ============================================
+// PLAY SONG BY ID
+// ============================================
+
+function playSongById(songId) {
+    if (!state.songsData) return;
+    
+    let foundSong = null;
+    let foundAlbum = null;
+    
+    for (const album of state.songsData.albums) {
+        for (const song of album.songs) {
+            if (song.id === songId) {
+                foundSong = song;
+                foundAlbum = album;
+                break;
+            }
+        }
+        if (foundSong) break;
+    }
+    
+    if (!foundSong) {
+        console.error('Song not found:', songId);
+        return;
+    }
+    
+    // Update state
+    state.player.currentSong = foundSong;
+    state.player.currentAlbum = foundAlbum;
+    state.player.isPlaying = true;
+    
+    // Update player display
+    const currentSongName = document.getElementById('current-song-name');
+    if (currentSongName) {
+        currentSongName.textContent = foundSong.title;
+    }
+    
+    const playIcon = document.getElementById('play-icon');
+    if (playIcon) {
+        playIcon.src = 'images/icons/pause.png';
+    }
+    
+    // Update lyrics page
+    updateLyrics(foundSong);
+    
+    // Save last played song
+    localStorage.setItem('diljit_last_song', JSON.stringify({
+        id: foundSong.id,
+        title: foundSong.title,
+        album: foundAlbum.name
+    }));
+    
+    console.log('Now playing:', foundSong.title);
+}
+
+// ============================================
+// UPDATE LYRICS
+// ============================================
+
+function updateLyrics(song) {
+    const lyricsTitle = document.getElementById('lyrics-song-title');
+    const lyricsText = document.getElementById('lyrics-text');
+    
+    if (lyricsTitle) {
+        lyricsTitle.textContent = song.title;
+    }
+    
+    if (lyricsText) {
+        if (song.lyrics && song.lyrics !== 'Lyrics coming soon...') {
+            // Format lyrics with timestamps
+            const lines = song.lyrics.split('\n');
+            let html = '';
+            lines.forEach(line => {
+                // Check if line has timestamp [0.0]
+                const timestampMatch = line.match(/^\[([\d.]+)\]\s*(.*)/);
+                if (timestampMatch) {
+                    const time = parseFloat(timestampMatch[1]);
+                    const text = timestampMatch[2];
+                    html += `<div class="lyrics-line" data-time="${time}">${text}</div>`;
+                } else if (line.trim()) {
+                    html += `<div class="lyrics-line">${line}</div>`;
+                }
+            });
+            lyricsText.innerHTML = html || 'No lyrics available for this song.';
+        } else {
+            lyricsText.textContent = 'Lyrics coming soon...';
+        }
     }
 }
 
@@ -834,10 +1047,27 @@ function setupScrollTracking() {
 // UTILITY FUNCTIONS
 // ============================================
 
-// Placeholder for loading songs.json
+// ============================================
+// LOAD SONGS FROM JSON
+// ============================================
+
 function loadSongs() {
-    // Will be implemented when songs.json is ready
-    console.log('Loading songs...');
+    return fetch('data/songs.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load songs.json');
+            }
+            return response.json();
+        })
+        .then(data => {
+            state.songsData = data;
+            console.log('Songs loaded successfully:', data.albums.length, 'albums');
+            return data;
+        })
+        .catch(error => {
+            console.error('Error loading songs:', error);
+            return null;
+        });
 }
 
 // ============================================
