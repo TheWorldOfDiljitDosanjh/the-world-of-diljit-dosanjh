@@ -548,6 +548,12 @@ function displayLibrary(data) {
     
     albumList.innerHTML = '';
     
+    // Load sort preference from localStorage
+    const savedSortPref = localStorage.getItem('diljit_sort_pref');
+    if (savedSortPref) {
+        state.sortPreference = savedSortPref;
+    }
+    
     // Sort albums based on preference
     let sortedAlbums = [...data.albums];
     
@@ -771,26 +777,40 @@ function buildQueue() {
 function buildQueueWithStartingSong(startingSong) {
     if (!state.songsData) return;
     
-    // Get all songs in alphabetical order (by album name, then track number)
+    // Get all songs
     let allSongs = [];
     state.songsData.albums.forEach(album => {
         album.songs.forEach(song => {
             allSongs.push({
                 ...song,
-                albumName: album.name
+                albumName: album.name,
+                releaseDate: album.releaseDate
             });
         });
     });
     
-    // Sort by album name (ignoring punctuation), then track number
-    allSongs.sort((a, b) => {
-        const cleanA = a.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const cleanB = b.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        if (cleanA !== cleanB) {
-            return cleanA.localeCompare(cleanB);
-        }
-        return a.track - b.track;
-    });
+    // Sort based on current sort preference
+    if (state.sortPreference === 'date') {
+        // Sort by release date (newest first), then track number
+        allSongs.sort((a, b) => {
+            const dateA = new Date(a.releaseDate);
+            const dateB = new Date(b.releaseDate);
+            if (dateA.getTime() !== dateB.getTime()) {
+                return dateB - dateA;
+            }
+            return a.track - b.track;
+        });
+    } else {
+        // Sort by album name (ignoring punctuation), then track number
+        allSongs.sort((a, b) => {
+            const cleanA = a.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const cleanB = b.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            if (cleanA !== cleanB) {
+                return cleanA.localeCompare(cleanB);
+            }
+            return a.track - b.track;
+        });
+    }
     
     // If shuffle is on, shuffle the queue with starting song first
     if (state.player.shuffle) {
@@ -815,18 +835,14 @@ function buildQueueWithStartingSong(startingSong) {
             }
         }
     } else {
-        // Shuffle is OFF - reorder so selected song is first, then the rest in album order
+        // Shuffle is OFF - reorder so selected song is first, then the rest in current sort order
         const startIndex = allSongs.findIndex(song => song.id === startingSong.id);
         if (startIndex !== -1) {
-            // Split the array at the startIndex
-            // Take the selected song and everything after it, then wrap around to the beginning
             const beforeSelected = allSongs.slice(0, startIndex);
             const selectedAndAfter = allSongs.slice(startIndex);
-            // Rebuild: selected + everything after it + everything before it
             allSongs = [...selectedAndAfter, ...beforeSelected];
         }
     }
-    // If shuffle is OFF, allSongs stays in sorted album order
     
     state.player.queue = allSongs;
     state.player.currentIndex = 0;
