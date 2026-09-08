@@ -784,6 +784,15 @@ function buildQueueWithStartingSong(startingSong) {
                 [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
             }
         }
+    } else {
+        // Shuffle is OFF - reorder so selected song is first, then the rest in album order
+        const startIndex = allSongs.findIndex(song => song.id === startingSong.id);
+        if (startIndex !== -1) {
+            // Remove the starting song
+            const [startSong] = allSongs.splice(startIndex, 1);
+            // Put it at the beginning
+            allSongs = [startSong, ...allSongs];
+        }
     }
     // If shuffle is OFF, allSongs stays in sorted album order
     
