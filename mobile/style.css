@@ -611,23 +611,22 @@ body.dark-mode #search-input {
 
 .search-dropdown {
     position: relative;
-    min-width: 80px;
+    min-width: 140px;
     flex-shrink: 0;
     z-index: 100;
 }
 
 .dropdown-toggle {
     width: 100%;
-    padding: 10px 10px;
+    padding: 10px 12px;
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 14px;
+    justify-content: space-between;
+    font-size: 16px;
     white-space: nowrap;
 }
 
@@ -886,7 +885,7 @@ body.dark-mode #lyrics-container {
     }
     
     .search-dropdown {
-        min-width: 70px;
+        min-width: 120px;
         z-index: 100;
     }
     
