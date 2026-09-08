@@ -43,14 +43,24 @@
                 
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Search...">
-                    <div class="search-dropdown">
-                        <button class="dropdown-toggle">
-                            <span id="search-type-label">Search by song</span>
+                    <div class="search-dropdown" id="search-dropdown">
+                        <button class="dropdown-toggle" id="search-toggle">
+                            <span id="search-type-label">Search</span>
                             <img src="images/icons/dropdown.png" alt="Dropdown" class="dropdown-icon">
                         </button>
-                        <ul class="dropdown-menu">
-                            <li data-search-type="song">Search by song</li>
-                            <li data-search-type="album">Search by album</li>
+                        <ul class="dropdown-menu" id="search-menu">
+                            <li data-search-type="song">Song</li>
+                            <li data-search-type="album">Album</li>
+                        </ul>
+                    </div>
+                    <div class="search-dropdown" id="sort-dropdown">
+                        <button class="dropdown-toggle" id="sort-toggle">
+                            <span id="sort-type-label">Sort</span>
+                            <img src="images/icons/dropdown.png" alt="Dropdown" class="dropdown-icon">
+                        </button>
+                        <ul class="dropdown-menu" id="sort-menu">
+                            <li data-sort-type="name">Name</li>
+                            <li data-sort-type="date">Date</li>
                         </ul>
                     </div>
                 </div>
