@@ -608,7 +608,7 @@ function displayLibrary(data) {
 // PLAY SONG BY ID
 // ============================================
 
-function playSongById(songId) {
+function playSongById(songId, rebuildQueue = true) {
     if (!state.songsData) return;
     
     let foundSong = null;
@@ -662,9 +662,10 @@ function playSongById(songId) {
     
     updateLyrics(foundSong);
     
-    // Always rebuild queue when a song is manually selected
-    // This puts the selected song at the start of the queue
-    buildQueueWithStartingSong(foundSong);
+    // Only rebuild queue if this is a manual selection (not Previous/Next)
+    if (rebuildQueue) {
+        buildQueueWithStartingSong(foundSong);
+    }
     
     localStorage.setItem('diljit_last_song', JSON.stringify({
         id: foundSong.id,
@@ -823,7 +824,7 @@ function handleSongEnded() {
     
     const nextSong = state.player.queue[state.player.currentIndex];
     if (nextSong) {
-        playSongById(nextSong.id);
+        playSongById(nextSong.id, false); // Don't rebuild queue
     }
 }
 
@@ -1059,7 +1060,7 @@ function setupPlayerControls() {
             
             const prevSong = state.player.queue[state.player.currentIndex];
             if (prevSong) {
-                playSongById(prevSong.id);
+                playSongById(prevSong.id, false); // Don't rebuild queue
             }
         });
     }
@@ -1087,7 +1088,7 @@ function setupPlayerControls() {
             
             const nextSong = state.player.queue[state.player.currentIndex];
             if (nextSong) {
-                playSongById(nextSong.id);
+                playSongById(nextSong.id, false); // Don't rebuild queue
             }
         });
     }
