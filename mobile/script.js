@@ -2,10 +2,6 @@
 // MOBILE VERSION - SCRIPT.JS
 // ============================================
 
-// ============================================
-// GLOBAL STATE
-// ============================================
-
 const state = {
     settings: {
         name: '',
@@ -31,6 +27,7 @@ const state = {
     isFirstVisit: true,
     currentPage: 'games',
     searchPreference: 'song',
+    sortPreference: 'name',
     songsData: null,
     scrollPositions: {
         home: 0,
@@ -531,11 +528,24 @@ function displayLibrary(data) {
     
     albumList.innerHTML = '';
     
-    const sortedAlbums = [...data.albums].sort((a, b) => {
-        const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        return cleanA.localeCompare(cleanB);
-    });
+    // Sort albums based on preference
+    let sortedAlbums = [...data.albums];
+    
+    if (state.sortPreference === 'date') {
+        // Sort by release date (newest first)
+        sortedAlbums.sort((a, b) => {
+            const dateA = new Date(a.releaseDate);
+            const dateB = new Date(b.releaseDate);
+            return dateB - dateA;
+        });
+    } else {
+        // Sort by name (default, ignore punctuation)
+        sortedAlbums.sort((a, b) => {
+            const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            return cleanA.localeCompare(cleanB);
+        });
+    }
     
     sortedAlbums.forEach(album => {
         const albumContainer = document.createElement('div');
