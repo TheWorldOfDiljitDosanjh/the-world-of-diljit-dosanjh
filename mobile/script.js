@@ -511,6 +511,12 @@ function setupLibrary() {
     const dropdownMenu = document.querySelector('.dropdown-menu');
     const searchTypeLabel = document.getElementById('search-type-label');
     
+    // Force load the preference from localStorage again to be safe
+    const savedPref = localStorage.getItem('diljit_search_pref');
+    if (savedPref) {
+        state.searchPreference = savedPref;
+    }
+    
     // Set the label to saved preference on load
     if (searchTypeLabel) {
         if (state.searchPreference === 'album') {
@@ -519,7 +525,7 @@ function setupLibrary() {
             searchTypeLabel.textContent = 'Search by song';
         }
     }
-    
+        
     if (dropdownToggle && dropdownMenu) {
         dropdownToggle.addEventListener('click', function(e) {
             e.stopPropagation();
