@@ -31,6 +31,7 @@ const state = {
     isFirstVisit: true,
     currentPage: 'games',
     searchPreference: 'song',
+    sortPreference: 'name',
     songsData: null,
     scrollPositions: {
         home: 0,
@@ -460,44 +461,44 @@ function setupLibrary() {
         }
     }
     
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
+    // Search dropdown
+    const searchToggle = document.getElementById('search-toggle');
+    const searchMenu = document.getElementById('search-menu');
     const searchTypeLabel = document.getElementById('search-type-label');
     
-    const savedPref = localStorage.getItem('diljit_search_pref');
-    if (savedPref) {
-        state.searchPreference = savedPref;
+    // Sort dropdown
+    const sortToggle = document.getElementById('sort-toggle');
+    const sortMenu = document.getElementById('sort-menu');
+    const sortTypeLabel = document.getElementById('sort-type-label');
+    
+    // Load saved preferences
+    const savedSearchPref = localStorage.getItem('diljit_search_pref');
+    if (savedSearchPref) {
+        state.searchPreference = savedSearchPref;
     }
     
-    if (searchTypeLabel) {
-        if (state.searchPreference === 'album') {
-            searchTypeLabel.textContent = 'Search by album';
-        } else {
-            searchTypeLabel.textContent = 'Search by song';
-        }
+    const savedSortPref = localStorage.getItem('diljit_sort_pref');
+    if (savedSortPref) {
+        state.sortPreference = savedSortPref;
+    } else {
+        state.sortPreference = 'name'; // Default
     }
-        
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener('click', function(e) {
+    
+    // Search dropdown
+    if (searchToggle && searchMenu) {
+        searchToggle.addEventListener('click', function(e) {
             e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
+            searchMenu.classList.toggle('show');
+            // Close sort menu if open
+            sortMenu.classList.remove('show');
         });
         
-        document.addEventListener('click', function() {
-            dropdownMenu.classList.remove('show');
-        });
-        
-        dropdownMenu.querySelectorAll('li').forEach(item => {
+        searchMenu.querySelectorAll('li').forEach(item => {
             item.addEventListener('click', function() {
                 const type = this.dataset.searchType;
                 state.searchPreference = type;
                 localStorage.setItem('diljit_search_pref', type);
-                
-                if (searchTypeLabel) {
-                    searchTypeLabel.textContent = type === 'song' ? 'Search by song' : 'Search by album';
-                }
-                
-                dropdownMenu.classList.remove('show');
+                searchMenu.classList.remove('show');
                 
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
@@ -506,6 +507,36 @@ function setupLibrary() {
             });
         });
     }
+    
+    // Sort dropdown
+    if (sortToggle && sortMenu) {
+        sortToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sortMenu.classList.toggle('show');
+            // Close search menu if open
+            searchMenu.classList.remove('show');
+        });
+        
+        sortMenu.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', function() {
+                const type = this.dataset.sortType;
+                state.sortPreference = type;
+                localStorage.setItem('diljit_sort_pref', type);
+                sortMenu.classList.remove('show');
+                
+                // Refresh the library with new sort
+                if (state.songsData) {
+                    displayLibrary(state.songsData);
+                }
+            });
+        });
+    }
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        if (searchMenu) searchMenu.classList.remove('show');
+        if (sortMenu) sortMenu.classList.remove('show');
+    });
     
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
@@ -531,11 +562,25 @@ function displayLibrary(data) {
     
     albumList.innerHTML = '';
     
-    const sortedAlbums = [...data.albums].sort((a, b) => {
-        const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        return cleanA.localeCompare(cleanB);
-    });
+    // Sort albums based on preference
+    let sortedAlbums = [...data.albums];
+    
+    if (state.sortPreference === 'date') {
+        // Sort by release date (newest first)
+        sortedAlbums.sort((a, b) => {
+            // Parse dates (handles "6 Feb 2025" format)
+            const dateA = new Date(a.releaseDate);
+            const dateB = new Date(b.releaseDate);
+            return dateB - dateA; // Newest first
+        });
+    } else {
+        // Sort by name (default, ignore punctuation)
+        sortedAlbums.sort((a, b) => {
+            const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            return cleanA.localeCompare(cleanB);
+        });
+    }
     
     sortedAlbums.forEach(album => {
         const albumContainer = document.createElement('div');
