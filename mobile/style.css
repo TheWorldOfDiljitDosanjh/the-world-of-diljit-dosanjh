@@ -618,7 +618,7 @@ body.dark-mode #search-input {
 
 .dropdown-toggle {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 2px solid #ddd;
     border-radius: 8px;
     background-color: #ffffff;
@@ -626,7 +626,7 @@ body.dark-mode #search-input {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -884,7 +884,7 @@ body.dark-mode #lyrics-container {
     }
     
     .search-dropdown {
-        min-width: 120px;
+        min-width: 110px;
         z-index: 100;
     }
     
