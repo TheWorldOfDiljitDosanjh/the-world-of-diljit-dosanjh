@@ -508,7 +508,6 @@ function displayLibrary(data) {
     albumList.innerHTML = '';
     
     const sortedAlbums = [...data.albums].sort((a, b) => {
-        // Remove punctuation and spaces for comparison
         const cleanA = a.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         const cleanB = b.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
         return cleanA.localeCompare(cleanB);
@@ -607,27 +606,22 @@ function playSongById(songId) {
         return;
     }
     
-    // Create or update audio element
     if (!state.player.audio) {
         state.player.audio = new Audio();
     }
     
-    // Stop current audio if playing
     if (state.player.isPlaying) {
         state.player.audio.pause();
     }
     
-    // Load new song
     state.player.audio.src = `audio/${foundSong.audio}`;
     state.player.audio.load();
     state.player.audio.currentTime = 0;
     
-    // Update state
     state.player.currentSong = foundSong;
     state.player.currentAlbum = foundAlbum;
     state.player.isPlaying = true;
     
-    // Update player display
     const currentSongName = document.getElementById('current-song-name');
     if (currentSongName) {
         currentSongName.textContent = foundSong.title;
@@ -638,25 +632,19 @@ function playSongById(songId) {
         playIcon.src = 'images/icons/pause.png';
     }
     
-    // Play the audio
     state.player.audio.play().catch(error => {
         console.error('Error playing audio:', error);
     });
     
-    // Update lyrics page
     updateLyrics(foundSong);
-    
-    // Build queue
     buildQueue();
     
-    // Save last played song
     localStorage.setItem('diljit_last_song', JSON.stringify({
         id: foundSong.id,
         title: foundSong.title,
         album: foundAlbum.name
     }));
     
-    // Set up audio ended event
     state.player.audio.onended = function() {
         handleSongEnded();
     };
@@ -665,13 +653,13 @@ function playSongById(songId) {
 }
 
 // ============================================
-// BUILD QUEUE
+// BUILD QUEUE - FIXED: Sorts albums alphabetically
 // ============================================
 
 function buildQueue() {
     if (!state.songsData) return;
     
-    // Get all songs in order
+    // Get all songs in alphabetical order (by album name, then track number)
     let allSongs = [];
     state.songsData.albums.forEach(album => {
         album.songs.forEach(song => {
@@ -682,9 +670,18 @@ function buildQueue() {
         });
     });
     
+    // Sort by album name (ignoring punctuation), then track number
+    allSongs.sort((a, b) => {
+        const cleanA = a.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        const cleanB = b.albumName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (cleanA !== cleanB) {
+            return cleanA.localeCompare(cleanB);
+        }
+        return a.track - b.track;
+    });
+    
     // If shuffle is on, shuffle the queue
     if (state.player.shuffle) {
-        // Shuffle algorithm - Fisher-Yates
         for (let i = allSongs.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
@@ -709,12 +706,11 @@ function buildQueue() {
 }
 
 // ============================================
-// HANDLE SONG ENDED
+// HANDLE SONG ENDED - FIXED: Repeats same order
 // ============================================
 
 function handleSongEnded() {
     if (state.player.loop === 'single') {
-        // Single song loop - replay current song
         if (state.player.audio) {
             state.player.audio.currentTime = 0;
             state.player.audio.play();
@@ -722,16 +718,14 @@ function handleSongEnded() {
         return;
     }
     
-    // Move to next song
     state.player.currentIndex++;
     
-    // Check if we've reached the end
     if (state.player.currentIndex >= state.player.queue.length) {
         if (state.player.loop === 'on') {
-            // Loop the entire playlist
+            // Loop - go back to the start of the current queue
             state.player.currentIndex = 0;
         } else {
-            // Stop playback
+            // Loop is OFF - stop playback
             state.player.currentIndex = state.player.queue.length - 1;
             state.player.isPlaying = false;
             const playIcon = document.getElementById('play-icon');
@@ -742,7 +736,6 @@ function handleSongEnded() {
         }
     }
     
-    // Play the next song
     const nextSong = state.player.queue[state.player.currentIndex];
     if (nextSong) {
         playSongById(nextSong.id);
@@ -875,12 +868,10 @@ function setupPlayerControls() {
     const loopIcon = document.getElementById('loop-icon');
     const currentSongName = document.getElementById('current-song-name');
     
-    // Default state - empty
     if (currentSongName) {
         currentSongName.textContent = '-';
     }
     
-    // Restore shuffle state
     if (shuffleIcon) {
         if (state.player.shuffle) {
             shuffleIcon.src = 'images/icons/shuffle-on.png';
@@ -889,7 +880,6 @@ function setupPlayerControls() {
         }
     }
     
-    // Restore loop state
     if (loopIcon) {
         switch(state.player.loop) {
             case 'off':
@@ -904,7 +894,6 @@ function setupPlayerControls() {
         }
     }
     
-    // Play/Pause
     if (playBtn && playIcon) {
         playBtn.addEventListener('click', function() {
             if (!state.player.currentSong) {
@@ -924,7 +913,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Shuffle
     if (shuffleBtn && shuffleIcon) {
         shuffleBtn.addEventListener('click', function() {
             state.player.shuffle = !state.player.shuffle;
@@ -936,10 +924,8 @@ function setupPlayerControls() {
                 shuffleIcon.src = 'images/icons/shuffle-off.png';
             }
             
-            // Rebuild queue with new shuffle setting
             buildQueue();
             
-            // Update current index
             if (state.player.currentSong) {
                 state.player.currentIndex = state.player.queue.findIndex(
                     song => song.id === state.player.currentSong.id
@@ -952,7 +938,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Loop
     if (loopBtn && loopIcon) {
         loopBtn.addEventListener('click', function() {
             const loopStates = ['off', 'on', 'single'];
@@ -975,7 +960,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Previous
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
             if (state.player.loop === 'single') {
@@ -999,7 +983,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Next
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
             if (state.player.loop === 'single') {
@@ -1028,7 +1011,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Rewind
     if (rewindBtn) {
         rewindBtn.addEventListener('click', function() {
             if (!state.player.audio) return;
@@ -1038,7 +1020,6 @@ function setupPlayerControls() {
         });
     }
     
-    // Forward
     if (forwardBtn) {
         forwardBtn.addEventListener('click', function() {
             if (!state.player.audio) return;
