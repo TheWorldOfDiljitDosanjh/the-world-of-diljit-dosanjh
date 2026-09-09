@@ -1149,8 +1149,10 @@ function formatTime(seconds) {
 }
 
 function cleanText(text) {
-    // Remove punctuation AND spaces, keep only letters and numbers
-    return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return text.toLowerCase()
+        .replace(/&/g, 'and')       // Convert & to 'and'
+        .replace(/and/g, '')        // Remove ALL 'and' (so blackandwhite becomes blackwhite)
+        .replace(/[^a-z0-9]/g, ''); // Remove everything else
 }
 
 // ============================================
