@@ -597,18 +597,20 @@ function displayLibrary(data) {
     
     if (query) {
         if (searchType === 'song') {
-            // Filter songs by title
+            // Filter songs by title (clean both the song title and the query)
             filteredAlbums = filteredAlbums.map(album => {
-                const matchingSongs = album.songs.filter(song =>
-                    song.title.toLowerCase().includes(query)
-                );
+                const matchingSongs = album.songs.filter(song => {
+                    const cleanSongTitle = cleanText(song.title);
+                    return cleanSongTitle.includes(query);
+                });
                 return { ...album, songs: matchingSongs };
             }).filter(album => album.songs.length > 0);
         } else {
-            // Search by album name
-            filteredAlbums = filteredAlbums.filter(album =>
-                album.name.toLowerCase().includes(query)
-            );
+            // Search by album name (clean both the album name and the query)
+            filteredAlbums = filteredAlbums.filter(album => {
+                const cleanAlbumName = cleanText(album.name);
+                return cleanAlbumName.includes(query);
+            });
         }
     }
     
@@ -1032,8 +1034,8 @@ function performSearch(query) {
     // If no songs data, return
     if (!state.songsData) return;
     
-    // Store the search query
-    state.searchQuery = query.toLowerCase().trim();
+    // Store the search query (cleaned of punctuation)
+    state.searchQuery = cleanText(query);
     
     // Re-display the library with the search filter
     displayLibrary(state.songsData);
@@ -1144,6 +1146,11 @@ function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function cleanText(text) {
+    // Remove punctuation, keep letters, numbers, and spaces
+    return text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
 }
 
 // ============================================
