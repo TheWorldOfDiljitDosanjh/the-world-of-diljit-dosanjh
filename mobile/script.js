@@ -409,6 +409,7 @@ function setupMainPage() {
     setupLyrics();
     setupGames();
     setupPlayerControls();
+    setupDraggableDot();
     loadLastPlayedSong();
     
     // Build queue if songs are loaded and no queue exists
@@ -696,7 +697,20 @@ function playSongById(songId, rebuildQueue = true) {
         console.error('Error playing audio:', error);
     });
     
+    // Set duration display
+    const songDurationDisplay = document.getElementById('song-duration');
+    if (songDurationDisplay && foundSong.duration) {
+        songDurationDisplay.textContent = formatTime(foundSong.duration);
+    }
+    
+    // Reset progress bar
+    const progressFilled = document.getElementById('progress-filled');
+    if (progressFilled) {
+        progressFilled.style.width = '0%';
+    }
+    
     updateLyrics(foundSong);
+    startProgressUpdate();
     
     // Only rebuild queue if this is a manual selection (not Previous/Next)
     if (rebuildQueue) {
@@ -996,6 +1010,155 @@ function setupGames() {
 }
 
 // ============================================
+// PROGRESS BAR FUNCTIONS
+// ============================================
+
+let progressInterval = null;
+
+function startProgressUpdate() {
+    stopProgressUpdate();
+    progressInterval = setInterval(updateProgress, 500);
+}
+
+function stopProgressUpdate() {
+    if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+    }
+}
+
+function updateProgress() {
+    const audio = state.player.audio;
+    if (!audio) return;
+    
+    const currentTime = audio.currentTime || 0;
+    const duration = audio.duration || 0;
+    
+    const currentTimeDisplay = document.getElementById('current-time');
+    const songDurationDisplay = document.getElementById('song-duration');
+    const progressFilled = document.getElementById('progress-filled');
+    const progressDot = document.getElementById('progress-dot');
+    
+    // Update time displays
+    if (currentTimeDisplay) {
+        currentTimeDisplay.textContent = formatTime(currentTime);
+    }
+    
+    if (songDurationDisplay && duration > 0) {
+        songDurationDisplay.textContent = formatTime(duration);
+    }
+    
+    // Update progress bar
+    if (progressFilled && duration > 0) {
+        const percentage = (currentTime / duration) * 100;
+        progressFilled.style.width = percentage + '%';
+        
+        // Show dot when a song is playing
+        if (progressDot && state.player.isPlaying) {
+            progressDot.classList.add('visible');
+        }
+    }
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// ============================================
+// DRAGGABLE PROGRESS DOT
+// ============================================
+
+function setupDraggableDot() {
+    const progressContainer = document.getElementById('progress-container');
+    const progressFilled = document.getElementById('progress-filled');
+    const progressDot = document.getElementById('progress-dot');
+    
+    if (!progressContainer || !progressDot) return;
+    
+    let isDragging = false;
+    
+    // Mouse events
+    progressContainer.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    
+    // Touch events
+    progressContainer.addEventListener('touchstart', startDragTouch, { passive: false });
+    document.addEventListener('touchmove', onDragTouch, { passive: false });
+    document.addEventListener('touchend', endDragTouch);
+    
+    function startDrag(e) {
+        if (!state.player.audio || !state.player.audio.duration) return;
+        isDragging = true;
+        updatePosition(e.clientX);
+        progressDot.style.cursor = 'grabbing';
+        progressContainer.style.cursor = 'grabbing';
+        e.preventDefault();
+    }
+    
+    function startDragTouch(e) {
+        if (!state.player.audio || !state.player.audio.duration) return;
+        isDragging = true;
+        const touch = e.touches[0];
+        updatePosition(touch.clientX);
+        e.preventDefault();
+    }
+    
+    function onDrag(e) {
+        if (!isDragging) return;
+        updatePosition(e.clientX);
+        e.preventDefault();
+    }
+    
+    function onDragTouch(e) {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        updatePosition(touch.clientX);
+        e.preventDefault();
+    }
+    
+    function endDrag() {
+        if (isDragging) {
+            isDragging = false;
+            progressDot.style.cursor = 'grab';
+            progressContainer.style.cursor = 'grab';
+        }
+    }
+    
+    function endDragTouch() {
+        if (isDragging) {
+            isDragging = false;
+        }
+    }
+    
+    function updatePosition(clientX) {
+        const rect = progressContainer.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const width = rect.width;
+        const percentage = Math.max(0, Math.min(1, x / width));
+        
+        const duration = state.player.audio.duration || 0;
+        const newTime = percentage * duration;
+        
+        state.player.audio.currentTime = newTime;
+        
+        // Update progress bar
+        if (progressFilled) {
+            progressFilled.style.width = (percentage * 100) + '%';
+        }
+        
+        // Update time display
+        const currentTimeDisplay = document.getElementById('current-time');
+        if (currentTimeDisplay) {
+            currentTimeDisplay.textContent = formatTime(newTime);
+        }
+    }
+}
+
+// ============================================
 // PLAYER CONTROLS
 // ============================================
 
@@ -1011,6 +1174,11 @@ function setupPlayerControls() {
     const loopBtn = document.getElementById('loop-btn');
     const loopIcon = document.getElementById('loop-icon');
     const currentSongName = document.getElementById('current-song-name');
+    const currentTimeDisplay = document.getElementById('current-time');
+    const songDurationDisplay = document.getElementById('song-duration');
+    const progressFilled = document.getElementById('progress-filled');
+    const progressDot = document.getElementById('progress-dot');
+    const progressContainer = document.getElementById('progress-container');
     
     if (currentSongName) {
         currentSongName.textContent = '-';
@@ -1050,9 +1218,11 @@ function setupPlayerControls() {
             if (state.player.isPlaying) {
                 state.player.audio.play();
                 playIcon.src = 'images/icons/pause.png';
+                startProgressUpdate();
             } else {
                 state.player.audio.pause();
                 playIcon.src = 'images/icons/play.png';
+                stopProgressUpdate();
             }
         });
     }
