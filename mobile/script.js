@@ -1149,8 +1149,8 @@ function formatTime(seconds) {
 }
 
 function cleanText(text) {
-    // Remove punctuation, keep letters, numbers, and spaces
-    return text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    // Remove punctuation AND spaces, keep only letters and numbers
+    return text.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
 // ============================================
