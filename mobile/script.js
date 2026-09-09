@@ -703,10 +703,16 @@ function playSongById(songId, rebuildQueue = true) {
         songDurationDisplay.textContent = formatTime(foundSong.duration);
     }
     
-    // Reset progress bar
-    const progressFilled = document.getElementById('progress-filled');
-    if (progressFilled) {
-        progressFilled.style.width = '0%';
+    // Reset progress bar (border fill)
+    const progressFill = document.getElementById('progress-border-fill');
+    if (progressFill) {
+        progressFill.style.width = '0%';
+    }
+    
+    // Reset dot position
+    const progressDot = document.getElementById('progress-dot');
+    if (progressDot) {
+        progressDot.style.left = '0px';
     }
     
     updateLyrics(foundSong);
@@ -1036,7 +1042,7 @@ function updateProgress() {
     
     const currentTimeDisplay = document.getElementById('current-time');
     const songDurationDisplay = document.getElementById('song-duration');
-    const progressFilled = document.getElementById('progress-filled');
+    const progressFill = document.getElementById('progress-border-fill');
     const progressDot = document.getElementById('progress-dot');
     
     // Update time displays
@@ -1048,13 +1054,20 @@ function updateProgress() {
         songDurationDisplay.textContent = formatTime(duration);
     }
     
-    // Update progress bar
-    if (progressFilled && duration > 0) {
+    // Update progress bar (border fill)
+    if (progressFill && duration > 0) {
         const percentage = (currentTime / duration) * 100;
-        progressFilled.style.width = percentage + '%';
+        progressFill.style.width = percentage + '%';
+    }
+    
+    // Update dot position
+    if (progressDot && duration > 0) {
+        const percentage = (currentTime / duration) * 100;
+        const dotLeft = (percentage / 100) * window.innerWidth;
+        progressDot.style.left = dotLeft + 'px';
         
         // Show dot when a song is playing
-        if (progressDot && state.player.isPlaying) {
+        if (state.player.isPlaying) {
             progressDot.classList.add('visible');
         }
     }
@@ -1072,30 +1085,32 @@ function formatTime(seconds) {
 // ============================================
 
 function setupDraggableDot() {
-    const progressContainer = document.getElementById('progress-container');
-    const progressFilled = document.getElementById('progress-filled');
     const progressDot = document.getElementById('progress-dot');
+    const progressFill = document.getElementById('progress-border-fill');
     
-    if (!progressContainer || !progressDot) return;
+    if (!progressDot) return;
     
     let isDragging = false;
     
-    // Mouse events
-    progressContainer.addEventListener('mousedown', startDrag);
+    // Mouse events - ONLY on the dot itself, not the bar
+    progressDot.addEventListener('mousedown', startDrag);
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
     
-    // Touch events
-    progressContainer.addEventListener('touchstart', startDragTouch, { passive: false });
+    // Touch events - ONLY on the dot itself
+    progressDot.addEventListener('touchstart', startDragTouch, { passive: false });
     document.addEventListener('touchmove', onDragTouch, { passive: false });
     document.addEventListener('touchend', endDragTouch);
+    
+    // Prevent click on dot from triggering anything else
+    progressDot.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
     
     function startDrag(e) {
         if (!state.player.audio || !state.player.audio.duration) return;
         isDragging = true;
-        updatePosition(e.clientX);
         progressDot.style.cursor = 'grabbing';
-        progressContainer.style.cursor = 'grabbing';
         e.preventDefault();
     }
     
@@ -1124,7 +1139,6 @@ function setupDraggableDot() {
         if (isDragging) {
             isDragging = false;
             progressDot.style.cursor = 'grab';
-            progressContainer.style.cursor = 'grab';
         }
     }
     
@@ -1135,20 +1149,26 @@ function setupDraggableDot() {
     }
     
     function updatePosition(clientX) {
-        const rect = progressContainer.getBoundingClientRect();
+        const duration = state.player.audio.duration || 0;
+        if (!duration) return;
+        
+        // Get the position relative to the full window width
+        const rect = document.body.getBoundingClientRect();
         const x = clientX - rect.left;
         const width = rect.width;
         const percentage = Math.max(0, Math.min(1, x / width));
         
-        const duration = state.player.audio.duration || 0;
         const newTime = percentage * duration;
-        
         state.player.audio.currentTime = newTime;
         
-        // Update progress bar
-        if (progressFilled) {
-            progressFilled.style.width = (percentage * 100) + '%';
+        // Update progress fill
+        if (progressFill) {
+            progressFill.style.width = (percentage * 100) + '%';
         }
+        
+        // Update dot position
+        const dotLeft = (percentage * 100) * (width / 100);
+        progressDot.style.left = dotLeft + 'px';
         
         // Update time display
         const currentTimeDisplay = document.getElementById('current-time');
