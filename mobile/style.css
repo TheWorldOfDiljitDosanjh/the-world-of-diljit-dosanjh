@@ -906,13 +906,13 @@ body.dark-mode .song-table td {
 /* Lyrics Styles */
 .lyrics-header {
     position: relative;
-    margin-bottom: 10px;
-    min-height: 30px;
+    margin-bottom: 20px;
+    min-height: 50px;
 }
 
 #lyrics-song-title {
     margin-bottom: 0;
-    padding-right: 65px;
+    padding-right: 70px;
 }
 
 #lyrics-album-cover {
