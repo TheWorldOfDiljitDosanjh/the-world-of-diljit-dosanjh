@@ -927,53 +927,6 @@ body.dark-mode .song-table td {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Lyrics Album Cover - Floating in corner */
-/* Lyrics Album Cover - Floating in corner */
-#lyrics-album-cover {
-    position: fixed;
-    top: 76px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
-    object-fit: cover;
-    cursor: pointer;
-    transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
-    border: 2px solid transparent;
-    z-index: 1001;
-    display: none;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-    background-color: #ffffff;
-}
-
-#lyrics-album-cover:hover {
-    opacity: 0.85;
-    border-color: #158edd;
-    transform: scale(1.05);
-}
-
-#lyrics-album-cover.visible {
-    display: block;
-}
-
-body.dark-mode #lyrics-album-cover {
-    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-    background-color: #1a1a1a;
-}
-
-#lyrics-album-cover:hover {
-    opacity: 0.8;
-    border-color: #158edd;
-}
-
-#lyrics-album-cover.visible {
-    display: block;
-}
-
-body.dark-mode #lyrics-album-cover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
 body.dark-mode #lyrics-container {
     background-color: #2a2a2a;
 }
@@ -1082,12 +1035,6 @@ body.dark-mode #lyrics-container {
     #progress-dot {
         width: 12px;
         height: 12px;
-    }
-    #lyrics-album-cover {
-        width: 40px;
-        height: 40px;
-        top: 76px;
-        right: 12px;
     }
 }
 
