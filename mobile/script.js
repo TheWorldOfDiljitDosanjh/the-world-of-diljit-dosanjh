@@ -412,33 +412,6 @@ function setupMainPage() {
     setupDraggableDot();
     loadLastPlayedSong();
     
-    // Add click handler for album cover
-    const albumCover = document.getElementById('lyrics-album-cover');
-    if (albumCover) {
-        albumCover.addEventListener('click', function() {
-            const albumName = this.dataset.albumName;
-            if (!albumName) return;
-            
-            // Switch to Library section
-            const libraryLink = document.querySelector('.nav-item[data-page="library"]');
-            if (libraryLink) {
-                libraryLink.click();
-            }
-            
-            // Scroll to the album after a short delay
-            setTimeout(function() {
-                const albumContainers = document.querySelectorAll('.album-container');
-                for (const container of albumContainers) {
-                    const nameElement = container.querySelector('.album-name');
-                    if (nameElement && nameElement.textContent === albumName) {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        break;
-                    }
-                }
-            }, 300);
-        });
-    }
-    
     // Build queue if songs are loaded and no queue exists
     if (state.songsData && state.player.queue.length === 0) {
         // If there's a last played song, use it
@@ -940,20 +913,9 @@ function handleSongEnded() {
 function updateLyrics(song) {
     const lyricsTitle = document.getElementById('lyrics-song-title');
     const lyricsText = document.getElementById('lyrics-text');
-    const albumCover = document.getElementById('lyrics-album-cover');
     
     if (lyricsTitle) {
         lyricsTitle.textContent = song.title;
-    }
-    
-    // Update album cover
-    if (albumCover && state.player.currentAlbum) {
-        const coverPath = `images/album-covers/${state.player.currentAlbum.cover}`;
-        albumCover.src = coverPath;
-        albumCover.alt = state.player.currentAlbum.name;
-        albumCover.style.display = 'block';
-        // Store album name for click handler
-        albumCover.dataset.albumName = state.player.currentAlbum.name;
     }
     
     if (lyricsText) {
