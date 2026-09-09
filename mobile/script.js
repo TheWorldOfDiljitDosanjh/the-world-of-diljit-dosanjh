@@ -1044,6 +1044,7 @@ function updateProgress() {
     const songDurationDisplay = document.getElementById('song-duration');
     const progressFill = document.getElementById('progress-border-fill');
     const progressDot = document.getElementById('progress-dot');
+    const progressWrapper = document.getElementById('progress-wrapper');
     
     // Update time displays
     if (currentTimeDisplay) {
@@ -1054,16 +1055,17 @@ function updateProgress() {
         songDurationDisplay.textContent = formatTime(duration);
     }
     
-    // Update progress bar (border fill)
+    // Update progress bar fill
     if (progressFill && duration > 0) {
         const percentage = (currentTime / duration) * 100;
         progressFill.style.width = percentage + '%';
     }
     
-    // Update dot position
-    if (progressDot && duration > 0) {
+    // Update dot position relative to wrapper
+    if (progressDot && progressWrapper && duration > 0) {
         const percentage = (currentTime / duration) * 100;
-        const dotLeft = (percentage / 100) * window.innerWidth;
+        const wrapperWidth = progressWrapper.offsetWidth;
+        const dotLeft = (percentage / 100) * wrapperWidth;
         progressDot.style.left = dotLeft + 'px';
         
         // Show dot when a song is playing
@@ -1092,7 +1094,7 @@ function setupDraggableDot() {
     
     let isDragging = false;
     
-    // Mouse events - ONLY on the dot itself, not the bar
+    // Mouse events - ONLY on the dot itself
     progressDot.addEventListener('mousedown', startDrag);
     document.addEventListener('mousemove', onDrag);
     document.addEventListener('mouseup', endDrag);
@@ -1152,8 +1154,11 @@ function setupDraggableDot() {
         const duration = state.player.audio.duration || 0;
         if (!duration) return;
         
-        // Get the position relative to the full window width
-        const rect = document.body.getBoundingClientRect();
+        // Get the position relative to the wrapper
+        const wrapper = document.getElementById('progress-wrapper');
+        if (!wrapper) return;
+        
+        const rect = wrapper.getBoundingClientRect();
         const x = clientX - rect.left;
         const width = rect.width;
         const percentage = Math.max(0, Math.min(1, x / width));
@@ -1167,7 +1172,7 @@ function setupDraggableDot() {
         }
         
         // Update dot position
-        const dotLeft = (percentage * 100) * (width / 100);
+        const dotLeft = percentage * width;
         progressDot.style.left = dotLeft + 'px';
         
         // Update time display
