@@ -28,6 +28,7 @@ const state = {
     currentPage: 'games',
     searchPreference: 'song',
     sortPreference: 'name',
+    searchQuery: '',
     songsData: null,
     scrollPositions: {
         home: 0,
@@ -517,7 +518,12 @@ function setupLibrary() {
                 
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
-                    performSearch(searchInput.value);
+                    // Clear search when changing type
+                    searchInput.value = '';
+                    state.searchQuery = '';
+                    if (state.songsData) {
+                        displayLibrary(state.songsData);
+                    }
                 }
             });
         });
@@ -582,8 +588,32 @@ function displayLibrary(data) {
         state.sortPreference = savedSortPref;
     }
     
+    // Get search query
+    const query = state.searchQuery || '';
+    const searchType = state.searchPreference || 'song';
+    
+    // Filter albums based on search
+    let filteredAlbums = [...data.albums];
+    
+    if (query) {
+        if (searchType === 'song') {
+            // Filter songs by title
+            filteredAlbums = filteredAlbums.map(album => {
+                const matchingSongs = album.songs.filter(song =>
+                    song.title.toLowerCase().includes(query)
+                );
+                return { ...album, songs: matchingSongs };
+            }).filter(album => album.songs.length > 0);
+        } else {
+            // Search by album name
+            filteredAlbums = filteredAlbums.filter(album =>
+                album.name.toLowerCase().includes(query)
+            );
+        }
+    }
+    
     // Sort albums based on preference
-    let sortedAlbums = [...data.albums];
+    let sortedAlbums = filteredAlbums;
     
     if (state.sortPreference === 'date') {
         // Sort by release date (newest first)
@@ -999,7 +1029,14 @@ function loadLastPlayedSong() {
 }
 
 function performSearch(query) {
-    console.log('Searching for:', query);
+    // If no songs data, return
+    if (!state.songsData) return;
+    
+    // Store the search query
+    state.searchQuery = query.toLowerCase().trim();
+    
+    // Re-display the library with the search filter
+    displayLibrary(state.songsData);
 }
 
 // ============================================
