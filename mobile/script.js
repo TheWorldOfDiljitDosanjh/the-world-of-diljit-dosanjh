@@ -412,32 +412,32 @@ function setupMainPage() {
     setupDraggableDot();
     loadLastPlayedSong();
     
-    // Add click handler for lyrics title
-    const lyricsTitle = document.getElementById('lyrics-song-title');
-    if (lyricsTitle) {
-        lyricsTitle.addEventListener('click', function() {
-            const albumName = this.dataset.albumName;
-            if (!albumName) return;
-            
-            // Switch to Library section
-            const libraryLink = document.querySelector('.nav-item[data-page="library"]');
-            if (libraryLink) {
-                libraryLink.click();
-            }
-            
-            // Scroll to the album after a short delay
-            setTimeout(function() {
-                const albumContainers = document.querySelectorAll('.album-container');
-                for (const container of albumContainers) {
-                    const nameElement = container.querySelector('.album-name');
-                    if (nameElement && nameElement.textContent === albumName) {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        break;
-                    }
+    // Add click handler for lyrics title (only on the span itself)
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('.lyrics-title-link');
+        if (!target) return;
+        
+        const albumName = target.dataset.album;
+        if (!albumName) return;
+        
+        // Switch to Library section
+        const libraryLink = document.querySelector('.nav-item[data-page="library"]');
+        if (libraryLink) {
+            libraryLink.click();
+        }
+        
+        // Scroll to the album after a short delay
+        setTimeout(function() {
+            const albumContainers = document.querySelectorAll('.album-container');
+            for (const container of albumContainers) {
+                const nameElement = container.querySelector('.album-name');
+                if (nameElement && nameElement.textContent === albumName) {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    break;
                 }
-            }, 300);
-        });
-    }
+            }
+        }, 300);
+    });
     
     // Build queue if songs are loaded and no queue exists
     if (state.songsData && state.player.queue.length === 0) {
@@ -942,10 +942,7 @@ function updateLyrics(song) {
     const lyricsText = document.getElementById('lyrics-text');
     
     if (lyricsTitle) {
-        // Make the title clickable
-        lyricsTitle.innerHTML = `<span style="cursor:pointer; color: #158edd; text-decoration: underline;">${song.title}</span>`;
-        // Store album name for click handler
-        lyricsTitle.dataset.albumName = state.player.currentAlbum ? state.player.currentAlbum.name : '';
+        lyricsTitle.innerHTML = `<span class="lyrics-title-link" data-album="${state.player.currentAlbum ? state.player.currentAlbum.name : ''}" style="cursor:pointer; color: #158edd;">${song.title}</span>`;
     }
     
     if (lyricsText) {
