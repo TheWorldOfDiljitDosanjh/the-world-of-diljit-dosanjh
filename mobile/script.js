@@ -1373,6 +1373,8 @@ function setupPlayerControls() {
             if (!state.player.audio) return;
             const newTime = Math.max(0, state.player.audio.currentTime - state.settings.rewindSeconds);
             state.player.audio.currentTime = newTime;
+            // Update progress bar immediately
+            updateProgress();
             console.log(`Rewind ${state.settings.rewindSeconds} seconds to ${newTime}s`);
         });
     }
@@ -1383,6 +1385,8 @@ function setupPlayerControls() {
             const duration = state.player.audio.duration || 0;
             const newTime = Math.min(duration, state.player.audio.currentTime + state.settings.forwardSeconds);
             state.player.audio.currentTime = newTime;
+            // Update progress bar immediately
+            updateProgress();
             console.log(`Forward ${state.settings.forwardSeconds} seconds to ${newTime}s`);
         });
     }
