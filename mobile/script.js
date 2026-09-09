@@ -742,7 +742,7 @@ function playSongById(songId, rebuildQueue = true) {
         progressDot.style.left = '0px';
     }
     
-    updateLyrics(foundSong);
+    updateLyrics(foundSong, foundAlbum);
     startProgressUpdate();
     
     // Only rebuild queue if this is a manual selection (not Previous/Next)
@@ -937,7 +937,7 @@ function handleSongEnded() {
 // UPDATE LYRICS
 // ============================================
 
-function updateLyrics(song) {
+function updateLyrics(song, album) {
     const lyricsTitle = document.getElementById('lyrics-song-title');
     const lyricsText = document.getElementById('lyrics-text');
     const albumCover = document.getElementById('lyrics-album-cover');
@@ -946,14 +946,15 @@ function updateLyrics(song) {
         lyricsTitle.textContent = song.title;
     }
     
-    // Update album cover
-    if (albumCover && state.player.currentAlbum) {
-        const coverPath = `images/album-covers/${state.player.currentAlbum.cover}`;
+    // Update album cover - use the passed album or fallback to state
+    const currentAlbum = album || state.player.currentAlbum;
+    if (albumCover && currentAlbum) {
+        const coverPath = `images/album-covers/${currentAlbum.cover}`;
         albumCover.src = coverPath;
-        albumCover.alt = state.player.currentAlbum.name;
+        albumCover.alt = currentAlbum.name;
         albumCover.classList.add('visible');
         // Store album name for click handler
-        albumCover.dataset.albumName = state.player.currentAlbum.name;
+        albumCover.dataset.albumName = currentAlbum.name;
     }
     
     if (lyricsText) {
@@ -995,7 +996,7 @@ function loadLastPlayedSong() {
                             }
                             state.player.currentSong = song;
                             state.player.currentAlbum = album;
-                            updateLyrics(song);
+                            updateLyrics(song, album);
                             break;
                         }
                     }
