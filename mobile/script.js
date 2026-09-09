@@ -19,7 +19,8 @@ const state = {
         queue: [],
         shuffle: true,
         loop: 'on', // 'off', 'on', 'single'
-        audio: null
+        audio: null,
+        positionInterval: null
     },
     lyrics: {
         sync: false
@@ -440,6 +441,38 @@ function setupMainPage() {
         }, 300);
     });
     
+    // Load saved playback position
+    const savedPosition = localStorage.getItem('diljit_playback_position');
+    if (savedPosition) {
+        try {
+            const parsed = JSON.parse(savedPosition);
+            // Find and play the song at the saved position
+            for (const album of state.songsData.albums) {
+                for (const song of album.songs) {
+                    if (song.id === parsed.songId) {
+                        // Build queue with this song
+                        buildQueueWithStartingSong(song);
+                        // Set the audio position after it loads
+                        if (state.player.audio) {
+                            state.player.audio.currentTime = parsed.currentTime || 0;
+                        }
+                        // Update the display
+                        const currentSongName = document.getElementById('current-song-name');
+                        if (currentSongName) {
+                            currentSongName.textContent = song.title;
+                        }
+                        // Update lyrics
+                        updateLyrics(song);
+                        // Don't auto-play - just load the position
+                        return;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error loading saved position:', e);
+        }
+    }
+    
     // Build queue if songs are loaded and no queue exists
     if (state.songsData && state.player.queue.length === 0) {
         // If there's a last played song, use it
@@ -790,6 +823,29 @@ function playSongById(songId, rebuildQueue = true) {
     
     state.player.audio.onended = function() {
         handleSongEnded();
+    };
+    
+    // Save playback position every 2 seconds
+    if (state.player.positionInterval) {
+        clearInterval(state.player.positionInterval);
+    }
+    state.player.positionInterval = setInterval(function() {
+        if (state.player.audio && state.player.isPlaying) {
+            localStorage.setItem('diljit_playback_position', JSON.stringify({
+                songId: state.player.currentSong.id,
+                currentTime: state.player.audio.currentTime
+            }));
+        }
+    }, 2000);
+    
+    // Also save on pause
+    state.player.audio.onpause = function() {
+        if (state.player.currentSong) {
+            localStorage.setItem('diljit_playback_position', JSON.stringify({
+                songId: state.player.currentSong.id,
+                currentTime: state.player.audio.currentTime
+            }));
+        }
     };
     
     console.log('Now playing:', foundSong.title);
