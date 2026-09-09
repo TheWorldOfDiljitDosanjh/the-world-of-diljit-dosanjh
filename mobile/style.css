@@ -904,6 +904,35 @@ body.dark-mode .song-table td {
 }
 
 /* Lyrics Styles */
+.lyrics-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#lyrics-song-title {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+#lyrics-album-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-left: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: 2px solid transparent;
+}
+
+#lyrics-album-cover:hover {
+    opacity: 0.8;
+    border-color: #158edd;
+}
+
 .lyrics-controls {
     display: flex;
     align-items: center;
