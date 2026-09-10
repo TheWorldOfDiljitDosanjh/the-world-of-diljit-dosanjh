@@ -725,21 +725,68 @@ body.dark-mode #song-duration {
     position: relative;
 }
 
+.search-input-wrapper {
+    flex: 1;
+    position: relative;
+    min-width: 0;
+    display: flex;
+}
+
 #search-input {
     flex: 1;
-    padding: 10px 12px;
+    padding: 10px 36px 10px 12px;
     border: 2px solid #ddd;
     border-radius: 8px;
     font-size: 16px;
     background-color: #ffffff;
     color: #000000;
     min-width: 0;
+    width: 100%;
 }
 
 body.dark-mode #search-input {
     background-color: #333333;
     color: #ffffff;
     border-color: #555555;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: none;
+    color: #999999;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.search-clear-btn:hover {
+    color: #666666;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .search-clear-btn {
+    color: #999999;
+}
+
+body.dark-mode .search-clear-btn:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-clear-btn.visible {
+    display: flex;
 }
 
 .search-dropdown {
