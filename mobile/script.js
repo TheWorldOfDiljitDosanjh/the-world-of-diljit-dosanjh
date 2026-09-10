@@ -1183,20 +1183,27 @@ function updateSyncHighlight(currentTime) {
         }
     }
     
+    // Only update if the active line has actually changed
+    const currentActive = document.querySelector('.lyrics-line.active');
+    const newActive = lyricsLines[activeIndex];
+    
+    if (currentActive === newActive) {
+        return; // No change, do nothing
+    }
+    
     // Remove active class from all lines
     lyricsLines.forEach(line => line.classList.remove('active'));
     
     // Add active class to the found line
-    if (activeIndex >= 0 && activeIndex < lyricsLines.length) {
-        const activeLine = lyricsLines[activeIndex];
-        activeLine.classList.add('active');
+    if (newActive) {
+        newActive.classList.add('active');
         
         // Auto-scroll to centre the active line
         const container = document.getElementById('lyrics-container');
         if (container) {
             const containerHeight = container.clientHeight;
-            const lineHeight = activeLine.offsetHeight;
-            const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+            const lineHeight = newActive.offsetHeight;
+            const scrollTo = newActive.offsetTop - (containerHeight / 2) + (lineHeight / 2);
             container.scrollTo({
                 top: scrollTo,
                 behavior: 'smooth'
@@ -1204,6 +1211,7 @@ function updateSyncHighlight(currentTime) {
         }
     }
 }
+
 function formatTime(seconds) {
     if (isNaN(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
