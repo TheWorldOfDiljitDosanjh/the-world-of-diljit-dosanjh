@@ -412,6 +412,7 @@ function setupMainPage() {
     setupPlayerControls();
     setupDraggableDot();
     loadLastPlayedSong();
+    setupPopup();
     
     // Add click handler for lyrics title (only on the span itself)
     document.addEventListener('click', function(e) {
@@ -462,6 +463,73 @@ function setupMainPage() {
         if (state.songsData.albums.length > 0 && state.songsData.albums[0].songs.length > 0) {
             buildQueueWithStartingSong(state.songsData.albums[0].songs[0]);
         }
+    }
+}
+
+// ============================================
+// POPUP - MUSIC STOP WARNING
+// ============================================
+
+function setupPopup() {
+    const popupOverlay = document.getElementById('popup-overlay');
+    const popupContinue = document.getElementById('popup-continue');
+    const popupStay = document.getElementById('popup-stay');
+    
+    if (!popupOverlay) return;
+    
+    let pendingUrl = null;
+    
+    // Intercept clicks on nav links that go to other pages
+    document.addEventListener('click', function(e) {
+        const navLink = e.target.closest('.nav-item');
+        if (!navLink) return;
+        
+        const href = navLink.getAttribute('href');
+        if (!href || href.startsWith('#')) return;
+        
+        // Only show popup if music is playing
+        if (state.player.currentSong && state.player.isPlaying) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Save the playback position
+            if (state.player.audio) {
+                localStorage.setItem('diljit_playback_position', JSON.stringify({
+                    songId: state.player.currentSong.id,
+                    currentTime: state.player.audio.currentTime
+                }));
+            }
+            
+            // Show the popup
+            pendingUrl = href;
+            popupOverlay.classList.add('visible');
+        }
+    }, true);
+    
+    // Continue button - stop music and navigate
+    if (popupContinue) {
+        popupContinue.addEventListener('click', function() {
+            // Stop the music
+            if (state.player.audio) {
+                state.player.audio.pause();
+                state.player.isPlaying = false;
+            }
+            
+            popupOverlay.classList.remove('visible');
+            
+            // Navigate
+            if (pendingUrl) {
+                window.location.href = pendingUrl;
+            }
+        });
+    }
+    
+    // Stay button - cancel navigation
+    if (popupStay) {
+        popupStay.addEventListener('click', function() {
+            popupOverlay.classList.remove('visible');
+            pendingUrl = null;
+        });
     }
 }
 
