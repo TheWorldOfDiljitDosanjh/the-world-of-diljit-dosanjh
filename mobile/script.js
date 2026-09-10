@@ -999,11 +999,6 @@ function updateLyrics(song) {
                 }
             });
             lyricsText.innerHTML = html || 'No lyrics available for this song.';
-            
-            // Remove any existing active highlights
-            document.querySelectorAll('.lyrics-line.active').forEach(line => {
-                line.classList.remove('active');
-            });
         } else {
             lyricsText.textContent = 'Lyrics coming soon...';
         }
@@ -1078,12 +1073,42 @@ function setupLyrics() {
             
             if (isSyncOn) {
                 lyricsContainer.classList.add('lyrics-sync-on');
+                // Snap to the current active line
+                const activeLine = document.querySelector('.lyrics-line.active');
+                if (activeLine && lyricsContainer) {
+                    const containerHeight = lyricsContainer.clientHeight;
+                    const lineHeight = activeLine.offsetHeight;
+                    const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+                    lyricsContainer.scrollTo({
+                        top: scrollTo,
+                        behavior: 'smooth'
+                    });
+                }
             } else {
                 lyricsContainer.classList.remove('lyrics-sync-on');
-                // Remove all active highlights
-                document.querySelectorAll('.lyrics-line.active').forEach(line => {
-                    line.classList.remove('active');
-                });
+            }
+        });
+    }
+    
+    // Click handler for lyric lines (tap to seek) - only when sync is off
+    if (lyricsContainer) {
+        lyricsContainer.addEventListener('click', function(e) {
+            // Only allow when sync is off
+            if (state.lyrics.sync) return;
+            
+            const line = e.target.closest('.lyrics-line[data-time]');
+            if (!line) return;
+            
+            const timeAttr = line.getAttribute('data-time');
+            if (timeAttr === null || timeAttr === '') return;
+            
+            const time = parseFloat(timeAttr);
+            if (isNaN(time)) return;
+            
+            // Jump to that position in the song
+            if (state.player.audio) {
+                state.player.audio.currentTime = time;
+                updateProgress();
             }
         });
     }
@@ -1156,10 +1181,8 @@ function updateProgress() {
         }
     }
     
-    // Update lyrics sync
-    if (state.lyrics.sync) {
-        updateSyncHighlight(currentTime);
-    }
+    // Always update the active lyric highlight (blue line)
+    updateSyncHighlight(currentTime);
 }
 
 function updateSyncHighlight(currentTime) {
@@ -1194,20 +1217,22 @@ function updateSyncHighlight(currentTime) {
     // Remove active class from all lines
     lyricsLines.forEach(line => line.classList.remove('active'));
     
-    // Add active class to the found line
+    // Add active class to the found line (always, regardless of sync state)
     if (newActive) {
         newActive.classList.add('active');
         
-        // Auto-scroll to centre the active line
-        const container = document.getElementById('lyrics-container');
-        if (container) {
-            const containerHeight = container.clientHeight;
-            const lineHeight = newActive.offsetHeight;
-            const scrollTo = newActive.offsetTop - (containerHeight / 2) + (lineHeight / 2);
-            container.scrollTo({
-                top: scrollTo,
-                behavior: 'smooth'
-            });
+        // Only auto-scroll when sync is on
+        if (state.lyrics.sync) {
+            const container = document.getElementById('lyrics-container');
+            if (container) {
+                const containerHeight = container.clientHeight;
+                const lineHeight = newActive.offsetHeight;
+                const scrollTo = newActive.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+                container.scrollTo({
+                    top: scrollTo,
+                    behavior: 'smooth'
+                });
+            }
         }
     }
 }
