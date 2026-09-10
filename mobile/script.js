@@ -718,9 +718,42 @@ function setupLibrary() {
     });
     
     const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear');
+    
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             performSearch(this.value);
+            
+            // Show/hide clear button
+            if (searchClear) {
+                if (this.value.length > 0) {
+                    searchClear.classList.add('visible');
+                } else {
+                    searchClear.classList.remove('visible');
+                }
+            }
+        });
+    }
+    
+    if (searchClear && searchInput) {
+        searchClear.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Clear the input
+            searchInput.value = '';
+            state.searchQuery = '';
+            
+            // Hide the clear button
+            searchClear.classList.remove('visible');
+            
+            // Re-display the full library
+            if (state.songsData) {
+                displayLibrary(state.songsData);
+            }
+            
+            // Focus back on the input
+            searchInput.focus();
         });
     }
     
