@@ -1078,11 +1078,8 @@ function setupLyrics() {
                 if (activeLine && lyricsContainer) {
                     const containerHeight = lyricsContainer.clientHeight;
                     const lineHeight = activeLine.offsetHeight;
-                    const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
-                    lyricsContainer.scrollTo({
-                        top: scrollTo,
-                        behavior: 'smooth'
-                    });
+                    const targetScroll = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+                    smoothScrollTo(lyricsContainer, targetScroll, 300);
                 }
             } else {
                 lyricsContainer.classList.remove('lyrics-sync-on');
@@ -1241,11 +1238,8 @@ function updateSyncHighlight(currentTime) {
             if (container) {
                 const containerHeight = container.clientHeight;
                 const lineHeight = newActive.offsetHeight;
-                const scrollTo = newActive.offsetTop - (containerHeight / 2) + (lineHeight / 2);
-                container.scrollTo({
-                    top: scrollTo,
-                    behavior: 'smooth'
-                });
+                const targetScroll = newActive.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+                smoothScrollTo(container, targetScroll, 300);
             }
         }
     }
@@ -1263,6 +1257,37 @@ function cleanText(text) {
         .replace(/&/g, 'and')       // Convert & to 'and'
         .replace(/and/g, '')        // Remove ALL 'and' (so blackandwhite becomes blackwhite)
         .replace(/[^a-z0-9]/g, ''); // Remove everything else
+}
+
+function smoothScrollTo(element, target, duration) {
+    const start = element.scrollTop;
+    const change = target - start;
+    const startTime = performance.now();
+    
+    // Cancel any existing scroll animation
+    if (element._scrollAnimation) {
+        cancelAnimationFrame(element._scrollAnimation);
+    }
+    
+    function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease in-out for smooth feel
+        const ease = progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        
+        element.scrollTop = start + (change * ease);
+        
+        if (progress < 1) {
+            element._scrollAnimation = requestAnimationFrame(animate);
+        } else {
+            element._scrollAnimation = null;
+        }
+    }
+    
+    element._scrollAnimation = requestAnimationFrame(animate);
 }
 
 // ============================================
