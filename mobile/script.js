@@ -1111,6 +1111,20 @@ function setupLyrics() {
                 updateProgress();
             }
         });
+        
+        // Prevent scrolling when sync is on
+        lyricsContainer.addEventListener('scroll', function() {
+            if (state.lyrics.sync) {
+                // Snap back to the active line
+                const activeLine = document.querySelector('.lyrics-line.active');
+                if (activeLine) {
+                    const containerHeight = lyricsContainer.clientHeight;
+                    const lineHeight = activeLine.offsetHeight;
+                    const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+                    lyricsContainer.scrollTop = scrollTo;
+                }
+            }
+        }, { passive: true });
     }
 }
 
