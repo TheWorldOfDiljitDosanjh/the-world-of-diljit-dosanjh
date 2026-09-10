@@ -777,6 +777,13 @@ function playSongById(songId, rebuildQueue = true) {
     updateLyrics(foundSong);
     startProgressUpdate();
     
+    // Reset sync highlighting when new song starts
+    if (state.lyrics.sync) {
+        setTimeout(function() {
+            updateSyncHighlight(0);
+        }, 100);
+    }
+    
     // Only rebuild queue if this is a manual selection (not Previous/Next)
     if (rebuildQueue) {
         buildQueueWithStartingSong(foundSong);
@@ -1137,6 +1144,60 @@ function updateProgress() {
         // Show dot when a song is playing
         if (state.player.isPlaying) {
             progressDot.classList.add('visible');
+        }
+    }
+    
+    // Update lyrics sync
+    if (state.lyrics.sync) {
+        updateSyncHighlight(currentTime);
+    }
+}
+
+function updateSyncHighlight(currentTime) {
+    const lyricsLines = document.querySelectorAll('.lyrics-line[data-time]');
+    if (!lyricsLines.length) return;
+    
+    let activeIndex = -1;
+    let nextLineTime = Infinity;
+    
+    // Find the line that matches the current time
+    for (let i = 0; i < lyricsLines.length; i++) {
+        const lineTime = parseFloat(lyricsLines[i].dataset.time);
+        if (lineTime <= currentTime && lineTime < nextLineTime) {
+            activeIndex = i;
+            nextLineTime = lineTime;
+        }
+    }
+    
+    // If no line found (song at beginning), set first line
+    if (activeIndex === -1 && lyricsLines.length > 0) {
+        // Check if currentTime is before first line
+        const firstTime = parseFloat(lyricsLines[0].dataset.time);
+        if (currentTime < firstTime) {
+            activeIndex = 0;
+        }
+    }
+    
+    // Remove active class from all lines
+    lyricsLines.forEach(line => line.classList.remove('active'));
+    
+    // Add active class to the found line
+    if (activeIndex !== -1 && activeIndex < lyricsLines.length) {
+        lyricsLines[activeIndex].classList.add('active');
+        
+        // Auto-scroll to centre the active line
+        const container = document.getElementById('lyrics-container');
+        if (container) {
+            const activeLine = lyricsLines[activeIndex];
+            const containerHeight = container.clientHeight;
+            const lineHeight = activeLine.offsetHeight;
+            
+            // Calculate scroll position to centre the line
+            const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
+            container.scrollTo({
+                top: scrollTo,
+                behavior: 'smooth'
+            });
         }
     }
 }
