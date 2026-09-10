@@ -953,8 +953,6 @@ body.dark-mode #lyrics-container {
 
 .lyrics-line.active {
     color: #158edd;
-    font-weight: 600;
-    font-size: 18px;
 }
 
 /* Responsive Scaling for Mobile - Prevent Zoom */
