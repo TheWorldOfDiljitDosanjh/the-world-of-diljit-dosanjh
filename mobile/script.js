@@ -999,6 +999,11 @@ function updateLyrics(song) {
                 }
             });
             lyricsText.innerHTML = html || 'No lyrics available for this song.';
+            
+            // Remove any existing active highlights
+            document.querySelectorAll('.lyrics-line.active').forEach(line => {
+                line.classList.remove('active');
+            });
         } else {
             lyricsText.textContent = 'Lyrics coming soon...';
         }
@@ -1075,6 +1080,10 @@ function setupLyrics() {
                 lyricsContainer.classList.add('lyrics-sync-on');
             } else {
                 lyricsContainer.classList.remove('lyrics-sync-on');
+                // Remove all active highlights
+                document.querySelectorAll('.lyrics-line.active').forEach(line => {
+                    line.classList.remove('active');
+                });
             }
         });
     }
@@ -1157,24 +1166,20 @@ function updateSyncHighlight(currentTime) {
     const lyricsLines = document.querySelectorAll('.lyrics-line[data-time]');
     if (!lyricsLines.length) return;
     
-    let activeIndex = -1;
-    let nextLineTime = Infinity;
+    let activeIndex = 0;
+    let latestTime = -1;
     
-    // Find the line that matches the current time
+    // Find the line with the largest timestamp that is <= currentTime
     for (let i = 0; i < lyricsLines.length; i++) {
-        const lineTime = parseFloat(lyricsLines[i].dataset.time);
-        if (lineTime <= currentTime && lineTime < nextLineTime) {
+        const timeAttr = lyricsLines[i].getAttribute('data-time');
+        if (timeAttr === null || timeAttr === '') continue;
+        
+        const lineTime = parseFloat(timeAttr);
+        if (isNaN(lineTime)) continue;
+        
+        if (lineTime <= currentTime && lineTime > latestTime) {
+            latestTime = lineTime;
             activeIndex = i;
-            nextLineTime = lineTime;
-        }
-    }
-    
-    // If no line found (song at beginning), set first line
-    if (activeIndex === -1 && lyricsLines.length > 0) {
-        // Check if currentTime is before first line
-        const firstTime = parseFloat(lyricsLines[0].dataset.time);
-        if (currentTime < firstTime) {
-            activeIndex = 0;
         }
     }
     
@@ -1182,17 +1187,15 @@ function updateSyncHighlight(currentTime) {
     lyricsLines.forEach(line => line.classList.remove('active'));
     
     // Add active class to the found line
-    if (activeIndex !== -1 && activeIndex < lyricsLines.length) {
-        lyricsLines[activeIndex].classList.add('active');
+    if (activeIndex >= 0 && activeIndex < lyricsLines.length) {
+        const activeLine = lyricsLines[activeIndex];
+        activeLine.classList.add('active');
         
         // Auto-scroll to centre the active line
         const container = document.getElementById('lyrics-container');
         if (container) {
-            const activeLine = lyricsLines[activeIndex];
             const containerHeight = container.clientHeight;
             const lineHeight = activeLine.offsetHeight;
-            
-            // Calculate scroll position to centre the line
             const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
             container.scrollTo({
                 top: scrollTo,
@@ -1201,7 +1204,6 @@ function updateSyncHighlight(currentTime) {
         }
     }
 }
-
 function formatTime(seconds) {
     if (isNaN(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
