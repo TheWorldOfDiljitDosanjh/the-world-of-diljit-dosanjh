@@ -1060,3 +1060,80 @@ body.dark-mode #lyrics-container {
 img, iframe, video, canvas, svg {
     max-width: 100%;
 }
+
+/* ============================================ */
+/* POPUP - Music Stop Warning                   */
+/* ============================================ */
+
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+#popup-overlay.visible {
+    display: flex;
+}
+
+#popup-box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    max-width: 320px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode #popup-box {
+    background-color: #2a2a2a;
+}
+
+#popup-message {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+#popup-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#popup-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+#popup-continue {
+    background-color: #158edd;
+    color: #ffffff;
+}
+
+#popup-continue:hover {
+    opacity: 0.9;
+}
+
+#popup-stay {
+    background-color: #808080;
+    color: #ffffff;
+}
+
+#popup-stay:hover {
+    opacity: 0.9;
+}
