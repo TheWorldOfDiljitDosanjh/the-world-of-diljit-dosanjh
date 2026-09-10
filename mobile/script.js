@@ -1109,19 +1109,19 @@ function setupLyrics() {
             }
         });
         
-        // Prevent scrolling when sync is on
-        lyricsContainer.addEventListener('scroll', function() {
+        // Block touch scrolling when sync is on
+        lyricsContainer.addEventListener('touchmove', function(e) {
             if (state.lyrics.sync) {
-                // Snap back to the active line
-                const activeLine = document.querySelector('.lyrics-line.active');
-                if (activeLine) {
-                    const containerHeight = lyricsContainer.clientHeight;
-                    const lineHeight = activeLine.offsetHeight;
-                    const scrollTo = activeLine.offsetTop - (containerHeight / 2) + (lineHeight / 2);
-                    lyricsContainer.scrollTop = scrollTo;
-                }
+                e.preventDefault();
             }
-        }, { passive: true });
+        }, { passive: false });
+        
+        // Block mouse wheel scrolling when sync is on
+        lyricsContainer.addEventListener('wheel', function(e) {
+            if (state.lyrics.sync) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
 }
 
