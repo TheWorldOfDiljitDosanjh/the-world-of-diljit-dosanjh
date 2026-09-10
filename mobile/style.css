@@ -944,7 +944,9 @@ body.dark-mode #lyrics-container {
 
 .lyrics-sync-on {
     overflow: hidden;
-}
+    touch-action: none;
+    overscroll-behavior: none;
+}    
 
 .lyrics-line {
     padding: 4px 0;
