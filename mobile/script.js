@@ -353,7 +353,7 @@ function setupSettingsPage() {
         saveBtn.addEventListener('click', function() {
             const nameVal = nameInput ? nameInput.value.trim() : '';
             if (!nameVal) {
-                alert('Please enter your name.');
+                showAlert('Please enter your name.');
                 return;
             }
             
@@ -464,6 +464,35 @@ function setupMainPage() {
             buildQueueWithStartingSong(state.songsData.albums[0].songs[0]);
         }
     }
+}
+
+// ============================================
+// CUSTOM ALERT & CONFIRM
+// ============================================
+
+function showAlert(message, callback) {
+    const overlay = document.getElementById('alert-overlay');
+    const messageEl = document.getElementById('alert-message');
+    const okBtn = document.getElementById('alert-ok');
+    
+    if (!overlay || !messageEl || !okBtn) {
+        // Fallback to native alert if elements missing
+        alert(message);
+        if (callback) callback();
+        return;
+    }
+    
+    messageEl.textContent = message;
+    overlay.classList.add('visible');
+    
+    // Remove any existing listener by cloning the button
+    const newOkBtn = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+    
+    newOkBtn.addEventListener('click', function() {
+        overlay.classList.remove('visible');
+        if (callback) callback();
+    });
 }
 
 // ============================================
@@ -1510,7 +1539,7 @@ function setupPlayerControls() {
     if (playBtn && playIcon) {
         playBtn.addEventListener('click', function() {
             if (!state.player.currentSong) {
-                alert('Please select a song from the Library first.');
+                showAlert('Please select a song from the Library first.');
                 return;
             }
             
