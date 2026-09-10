@@ -369,23 +369,33 @@ function setupSettingsPage() {
     
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                localStorage.clear();
-                
-                state.settings = {
-                    name: '',
-                    theme: 'light',
-                    musicService: 'spotify',
-                    rewindSeconds: 10,
-                    forwardSeconds: 10
-                };
-                state.player.shuffle = false;
-                state.player.loop = 'off';
-                state.lyrics.sync = false;
-                state.isFirstVisit = true;
-                
-                window.location.reload();
-            }
+            showConfirm(
+                'Are you sure you want to reset all data? This cannot be undone.',
+                function() {
+                    // On confirm
+                    localStorage.clear();
+                    
+                    state.settings = {
+                        name: '',
+                        theme: 'light',
+                        musicService: 'spotify',
+                        rewindSeconds: 10,
+                        forwardSeconds: 10
+                    };
+                    state.player.shuffle = false;
+                    state.player.loop = 'off';
+                    state.lyrics.sync = false;
+                    state.isFirstVisit = true;
+                    
+                    window.location.reload();
+                },
+                null,
+                {
+                    yesText: 'Reset',
+                    noText: 'Cancel',
+                    danger: true
+                }
+            );
         });
     }
 }
@@ -492,6 +502,58 @@ function showAlert(message, callback) {
     newOkBtn.addEventListener('click', function() {
         overlay.classList.remove('visible');
         if (callback) callback();
+    });
+}
+
+function showConfirm(message, onConfirm, onCancel, options) {
+    const overlay = document.getElementById('confirm-overlay');
+    const messageEl = document.getElementById('confirm-message');
+    const yesBtn = document.getElementById('confirm-yes');
+    const noBtn = document.getElementById('confirm-no');
+    
+    // Default options
+    const opts = options || {};
+    const yesText = opts.yesText || 'Yes';
+    const noText = opts.noText || 'No';
+    const danger = opts.danger || false;
+    
+    if (!overlay || !messageEl || !yesBtn || !noBtn) {
+        // Fallback to native confirm if elements missing
+        if (confirm(message)) {
+            if (onConfirm) onConfirm();
+        } else {
+            if (onCancel) onCancel();
+        }
+        return;
+    }
+    
+    messageEl.textContent = message;
+    yesBtn.textContent = yesText;
+    noBtn.textContent = noText;
+    
+    // Toggle danger styling
+    if (danger) {
+        yesBtn.classList.add('danger');
+    } else {
+        yesBtn.classList.remove('danger');
+    }
+    
+    overlay.classList.add('visible');
+    
+    // Clone buttons to remove old listeners
+    const newYesBtn = yesBtn.cloneNode(true);
+    const newNoBtn = noBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+    noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+    
+    newYesBtn.addEventListener('click', function() {
+        overlay.classList.remove('visible');
+        if (onConfirm) onConfirm();
+    });
+    
+    newNoBtn.addEventListener('click', function() {
+        overlay.classList.remove('visible');
+        if (onCancel) onCancel();
     });
 }
 
