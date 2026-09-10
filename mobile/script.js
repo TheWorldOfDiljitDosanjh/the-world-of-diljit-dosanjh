@@ -30,6 +30,7 @@ const state = {
     searchPreference: 'song',
     sortPreference: 'name',
     searchQuery: '',
+    savedPosition: undefined,
     songsData: null,
     scrollPositions: {
         home: 0,
@@ -452,10 +453,8 @@ function setupMainPage() {
                     if (song.id === parsed.songId) {
                         // Build queue with this song
                         buildQueueWithStartingSong(song);
-                        // Set the audio position after it loads
-                        if (state.player.audio) {
-                            state.player.audio.currentTime = parsed.currentTime || 0;
-                        }
+                        // Store the saved position to apply when audio loads
+                        state.savedPosition = parsed.currentTime || 0;
                         // Update the display
                         const currentSongName = document.getElementById('current-song-name');
                         if (currentSongName) {
@@ -769,7 +768,14 @@ function playSongById(songId, rebuildQueue = true) {
     
     state.player.audio.src = `audio/${foundSong.audio}`;
     state.player.audio.load();
-    state.player.audio.currentTime = 0;
+    
+    // Apply saved position if this is the song that was saved
+    if (state.savedPosition !== undefined && foundSong.id === state.player.currentSong.id) {
+        state.player.audio.currentTime = state.savedPosition;
+        state.savedPosition = undefined;
+    } else {
+        state.player.audio.currentTime = 0;
+    }
     
     state.player.currentSong = foundSong;
     state.player.currentAlbum = foundAlbum;
