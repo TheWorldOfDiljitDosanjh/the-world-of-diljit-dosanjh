@@ -1333,7 +1333,7 @@ let progressInterval = null;
 
 function startProgressUpdate() {
     stopProgressUpdate();
-    progressInterval = setInterval(updateProgress, 500);
+    progressInterval = setInterval(updateProgress, 100);
 }
 
 function stopProgressUpdate() {
