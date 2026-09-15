@@ -1247,6 +1247,25 @@ function performSearch(query) {
 function setupLyrics() {
     const syncToggle = document.getElementById('sync-toggle');
     const lyricsContainer = document.getElementById('lyrics-container');
+    const syncInfo = document.getElementById('sync-info');
+    const syncInfoBox = document.getElementById('sync-info-box');
+    
+    // Info icon click handler
+    if (syncInfo && syncInfoBox) {
+        syncInfo.addEventListener('click', function(e) {
+            e.stopPropagation();
+            syncInfoBox.classList.toggle('visible');
+        });
+        
+        // Close info box when clicking anywhere else
+        document.addEventListener('click', function(e) {
+            if (syncInfoBox.classList.contains('visible')) {
+                if (!syncInfoBox.contains(e.target) && e.target !== syncInfo) {
+                    syncInfoBox.classList.remove('visible');
+                }
+            }
+        });
+    }
     
     if (syncToggle) {
         if (state.lyrics.sync) {
