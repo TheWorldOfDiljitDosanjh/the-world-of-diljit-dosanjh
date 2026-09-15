@@ -1392,7 +1392,7 @@ function updateSyncHighlight(currentTime) {
     const lyricsLines = document.querySelectorAll('.lyrics-line[data-time]');
     if (!lyricsLines.length) return;
     
-    let activeIndex = 0;
+    let activeIndex = -1;
     let latestTime = -1;
     
     // Find the line with the largest timestamp that is <= currentTime
@@ -1407,6 +1407,11 @@ function updateSyncHighlight(currentTime) {
             latestTime = lineTime;
             activeIndex = i;
         }
+    }
+    
+    // If no line has been reached yet, do nothing
+    if (activeIndex === -1) {
+        return;
     }
     
     // Only update if the active line has actually changed
