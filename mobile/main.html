@@ -83,9 +83,16 @@
         <section id="lyrics" class="page-section">
             <h2 id="lyrics-song-title">Select a song first</h2>
             <div class="lyrics-controls">
-                <span class="sync-label">Sync</span>
+                <span class="sync-label">Autoscroll</span>
+                <button type="button" class="info-icon" id="sync-info">i</button>
                 <div class="toggle-switch" id="sync-toggle">
                     <div class="toggle-knob"></div>
+                </div>
+                <div class="info-box" id="sync-info-box">
+                    <p><strong>Autoscroll ON</strong></p>
+                    <p>Lyrics stay focused on the current line. Scrolling and tapping are disabled.</p>
+                    <p><strong>Autoscroll OFF</strong></p>
+                    <p>You can scroll freely. Tap any line to jump to that part of the song.</p>
                 </div>
             </div>
             <div id="lyrics-container">
