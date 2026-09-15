@@ -967,11 +967,91 @@ body.dark-mode .song-table td {
     align-items: center;
     gap: 12px;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .sync-label {
     font-weight: 600;
     font-size: 16px;
+}
+
+/* Info icon */
+.info-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #999999;
+    background-color: transparent;
+    color: #999999;
+    font-size: 13px;
+    font-weight: 600;
+    font-style: italic;
+    font-family: Georgia, serif;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+
+.info-icon:hover {
+    color: #666666;
+    border-color: #666666;
+}
+
+body.dark-mode .info-icon {
+    color: #999999;
+    border-color: #999999;
+}
+
+body.dark-mode .info-icon:hover {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* Info box */
+.info-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.info-box.visible {
+    display: block;
+}
+
+.info-box p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+}
+
+.info-box p:last-child {
+    margin-bottom: 0;
+}
+
+.info-box strong {
+    font-weight: 600;
+}
+
+body.dark-mode .info-box {
+    background-color: #333333;
+    border-color: #555555;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 #lyrics-container {
